@@ -1,0 +1,53 @@
+<app-header></app-header>
+<div class="container mt-4">
+  <h2 class="mb-4">My Cart</h2>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+              <tr>
+                <th>Product</th>
+                <th>Price per item (Baht)</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let product of cartItems">
+                <td>
+                  <img [src]="product.ImageUrl" alt="{{ product.ProductName }}" class="img-thumbnail" width="50" />
+                  {{ product.ProductName }}
+                </td>
+                <td>{{ product.Price | currency: 'THB' }}</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-secondary btn-sm" (click)="decreaseQuantity(product)">-</button>
+                    <input type="number" [(ngModel)]="product.quantity" min="1" class="form-control mx-2" (ngModelChange)="updateQuantity(product)" />
+                    <button class="btn btn-outline-secondary btn-sm" (click)="increaseQuantity(product)">+</button>
+                  </div>
+                </td>
+                <td>{{ product.Price * product.quantity | currency: 'THB' }}</td>
+                <td>
+                  <button class="btn btn-danger btn-sm" (click)="removeItem(product)">Remove</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card p-3">
+        <h5 class="card-title">Summary</h5>
+        <p class="card-text">Items: {{ totalItems }}</p>
+        <p class="card-text">Total: {{ totalAmount | currency: 'THB' }}</p>
+        <button class="btn btn-primary w-100" (click)="placeOrder()">Place Order</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,83 @@
+<app-header></app-header>
+<div class="container">
+  <h2>Product Management</h2>
+
+  <!-- ฟอร์มสำหรับเพิ่มหรือแก้ไขสินค้า -->
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="productName">Product Name</label>
+      <input type="text" id="productName" class="form-control" formControlName="productName" required />
+    </div>
+
+    <div class="form-group">
+      <label for="categoryId">Category ID</label>
+      <input type="number" id="categoryId" class="form-control" formControlName="categoryId" required />
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" class="form-control" formControlName="description"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="price">Price</label>
+      <input type="number" id="price" class="form-control" formControlName="price" required />
+    </div>
+
+    <div class="form-group">
+      <label for="stock">Stock</label>
+      <input type="number" id="stock" class="form-control" formControlName="stock" required />
+    </div>
+
+    <div class="form-group">
+      <label for="brand">Brand</label>
+      <input type="text" id="brand" class="form-control" formControlName="brand" />
+    </div>
+
+    <div class="form-group">
+      <label for="model">Model</label>
+      <input type="text" id="model" class="form-control" formControlName="model" />
+    </div>
+
+    <div class="form-group">
+      <label for="image">Product Image</label>
+      <input type="file" id="image" class="form-control" (change)="onFileSelected($event)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="productForm.invalid">
+      {{ isEditMode ? 'Update Product' : 'Add Product' }}
+    </button>
+  </form>
+
+  <!-- ตารางแสดงรายการสินค้า -->
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Product Management</h2>
+    <table class="table table-striped table-hover">
+      <thead class="thead-dark">
+        <tr>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Image</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of products">
+          <td>{{ product.ProductName }}</td>
+          <td>{{ product.Price | currency }}</td>
+          <td>
+            <img [src]="product.ImageUrl" alt="Product Image" class="img-fluid" style="max-width: 100px;">
+          </td>
+          <td>
+            <button class="btn btn-warning btn-sm mr-2" (click)="onEdit(product)">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn btn-danger btn-sm" (click)="onDelete(product.ProductId)">
+              <i class="fas fa-trash-alt"></i> Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

@@ -1,0 +1,41 @@
+<header class="p-1 mb-3 border-bottom">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">
+          <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap">
+            <use xlink:href="#bootstrap"></use>
+          </svg>
+        </a>
+        <div routerLink="/home">
+          <img
+            src="https://media.discordapp.net/attachments/1275377791839240282/1279774263833923584/pimsubgear.png?ex=66eb6ae9&is=66ea1969&hm=dac350e4775cd6f740408ba33f34951bda8180b5d898dada3fd48331efab17ea&=&format=webp&quality=lossless&width=413&height=437">
+        </div>
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+          <li><a href="#" class="nav-link px-3 link-secondary" routerLink="/home">Home</a></li>
+          <li><a href="#" class="nav-link px-3 link-body-emphasis" routerLink="/product-list">Product</a></li>
+          <li><a href="#" class="nav-link px-3 link-body-emphasis" routerLink="/about-us">About us</a></li>
+        <!--<li><a href="#" class="nav-link px-3 link-body-emphasis">Service</a></li>-->
+          <li><a href="#" class="nav-link px-3 link-body-emphasis" routerLink="/contact-us">Contact</a></li>
+        </ul>
+  
+        <form class="form-inline my-2 my-lg-0" (ngSubmit)="onSearch()">
+          <div class="input-group">
+            <input class="form-control" type="search" placeholder="Search products" [(ngModel)]="searchTerm" name="search">
+            <div class="input-group-append">
+              <button class="btn btn-primary" type="submit">ค้นหา</button>
+            </div>
+          </div>
+        </form>
+        
+        
+
+        <a routerLink="/cart">
+        <i class="bi bi-cart2"></i>
+        </a>
+        <button type="submit" class="signin-button" routerLink="/login">เข้าสู่ระบบ</button>
+  
+      </div>
+    </div>
+  </header>
+  
+  

@@ -1,0 +1,11 @@
+/* ปรับให้การ์ดมีขนาดและช่องว่างที่เหมาะสม */
+.card {
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 1rem rgba(0,0,0,0.1);
+}
+
+.card-img-top {
+  height: 150px; /* กำหนดความสูงของรูปภาพ */
+  object-fit: cover; /* ปรับขนาดรูปให้เต็มกรอบ */
+}

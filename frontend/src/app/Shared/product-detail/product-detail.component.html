@@ -1,0 +1,33 @@
+<app-header></app-header>
+<div *ngIf="product" class="container mt-5">
+  <div class="row">
+    <div class="col-md-6">
+      <img [src]="product.ImageUrl" alt="{{ product.ProductName }}" class="img-fluid">
+    </div>
+    <div class="col-md-6">
+      <h2>{{ product.ProductName }}</h2>
+      <h4>{{ product.Price | currency }}</h4>
+      <p>{{ product.Description }}</p>
+      <p><strong>Brand:</strong> {{ product.Brand }}</p>
+      <p><strong>Model:</strong> {{ product.Model }}</p>
+      <p><strong>Stock:</strong> {{ product.Stock }}</p>
+
+      <!-- การเลือกจำนวน -->
+      <div class="form-group mt-3">
+        <label><strong>จำนวน:</strong></label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <button class="btn btn-primary" type="button" (click)="updateQuantity(-1)">-</button>
+          </div>
+          <input type="number" [(ngModel)]="quantity" class="form-control text-center" readonly>
+          <div class="input-group-append">
+            <button class="btn btn-primary" type="button" (click)="updateQuantity(1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ปุ่มเพิ่มลงในตะกร้า -->
+      <button class="btn btn-primary mt-4" (click)="addToCart()">เพิ่มลงในตะกร้า</button>
+    </div>
+  </div>
+</div>
