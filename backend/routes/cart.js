@@ -28,18 +28,27 @@ router.post('/cart', (req, res) => {
 // Route สำหรับดึงข้อมูลรถเข็นของผู้ใช้
 router.get('/cart/:userId', (req, res) => {
     const userId = req.params.userId;
+
+    if (!userId) {
+        return res.status(400).send({ error: "User ID is required" });
+    }
+
     const query = `SELECT * FROM Cart WHERE UserId = @UserId`;
     const requestSql = new sql.Request();
-    requestSql.input("UserId", sql.Int, userId);
+    requestSql.input('UserId', sql.Int, userId);
 
     requestSql.query(query, (err, result) => {
         if (err) {
             console.error("Error fetching cart items:", err);
             return res.status(500).send({ error: "Internal server error" });
         }
+        if (result.recordset.length === 0) {
+            return res.status(404).send({ error: "Cart not found for user" });
+        }
         res.send(result.recordset);
     });
 });
+
 
 // Route สำหรับอัปเดตจำนวนสินค้าในรถเข็น
 router.put('/cart/:id', (req, res) => {

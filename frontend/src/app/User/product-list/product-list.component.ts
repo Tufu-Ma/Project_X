@@ -60,24 +60,4 @@ export class ProductListComponent implements OnInit {
     this.router.navigate(['/product-detail', productId]);  // นำทางไปยังหน้ารายละเอียดสินค้า
   }
 
-  // ฟังก์ชันสำหรับเพิ่มสินค้าลงในตะกร้า
-  addToCart(product: any): void {
-    const productToAdd = {
-      ProductId: product.ProductId,  // ต้องมี ProductId
-      ProductName: product.ProductName,  // ต้องมี ProductName
-      Price: product.Price,  // ต้องมี Price
-      ImageUrl: product.ImageUrl,  // ต้องมี ImageUrl
-      quantity: 1  // เริ่มต้นที่จำนวน 1
-    };
-  
-    // ตรวจสอบข้อมูลสินค้าก่อนเพิ่มลงในตะกร้า
-    if (!productToAdd.ProductId || !productToAdd.ProductName || !productToAdd.Price || !productToAdd.ImageUrl) {
-      console.error('Some product details are missing:', productToAdd);
-      return;
-    }
-
-    // เพิ่มสินค้าไปยัง CartService
-    this.cartService.addToCart(productToAdd);
-    alert(`${product.ProductName} ถูกเพิ่มลงในตะกร้าแล้ว`);
-  }
 }
