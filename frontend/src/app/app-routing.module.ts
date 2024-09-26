@@ -29,7 +29,10 @@ const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'header',component: HeaderComponent},
   { path: 'login-header',component:LoginHeaderComponent},
-  { path: 'cart',component:ShoppingCartComponent},
+  
+  // ป้องกันการเข้าถึงหน้าตะกร้าสินค้าด้วย AuthGuard
+  { path: 'cart',component:ShoppingCartComponent, canActivate: [AuthGuard] },
+  
   { path: 'about-us',component:AboutUsComponent},
   { path: 'contact-us',component:ContactUsComponent},
   

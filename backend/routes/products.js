@@ -36,7 +36,7 @@ router.post('/', upload.single('image'), (req, res) => {
     requestSql.input('Model', sql.NVarChar, model || null);
     requestSql.input('ImageUrl', sql.NVarChar, imageUrl || null);
 
-    // ทำการ query เพื่อเพิ่มสินค้า
+    // ทำการ query เพื่อเพิ่มสินค้า 
     requestSql.query(query, (err, result) => {
         if (err) {
             console.error('Error executing SQL query:', err);  // แสดงข้อผิดพลาดจาก SQL query

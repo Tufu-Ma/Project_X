@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CartService } from '../../services/cart.service';
-
+import { AuthService } from '../../auth.service';
 @Component({
   selector: 'app-shopping-cart',
   templateUrl: './shopping-cart.component.html',
@@ -11,7 +11,7 @@ export class ShoppingCartComponent implements OnInit {
   totalItems: number = 0;
   totalAmount: number = 0;
 
-  constructor(private cartService: CartService) { }
+  constructor(private cartService: CartService, private authService: AuthService) { }
 
 
   ngOnInit(): void {
@@ -19,15 +19,18 @@ export class ShoppingCartComponent implements OnInit {
   }
 
   loadCart() {
-    this.cartService.getCartItems().subscribe(items => {
-      this.cartItems = items;
-
-      console.log('Loaded cart items:', this.cartItems);  // ตรวจสอบข้อมูลสินค้าที่ถูกโหลดเข้ามาในตะกร้า
-
-      this.calculateTotals();  // คำนวณยอดรวมของสินค้าในตะกร้า
-    });
-  }
-
+    const userId = parseInt(this.authService.getUserId() || '0', 10);  // แปลง string เป็น number
+    
+    if (userId) {
+      this.cartService.getCartItems(userId).subscribe((items: any[]) => {
+        this.cartItems = items;
+        console.log('Loaded cart items:', this.cartItems);
+        this.calculateTotals();
+      });
+    } else {
+      console.log('User is not logged in or UserId is missing.');
+    }
+  }  
 
   calculateTotals() {
     this.totalItems = this.cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0);  // คำนวณจำนวนสินค้าทั้งหมด
