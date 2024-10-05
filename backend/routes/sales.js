@@ -1,36 +1,28 @@
-// sales.controller.js (ไฟล์ใหม่)
-const { sql, poolPromise } = require('../config/dbconfig');
+const express = require('express');
+const router = express.Router();
+const sql = require('mssql'); // เชื่อมต่อกับ SQL Server
 
-exports.getSalesData = async (req, res) => {
+// Endpoint สำหรับดึงข้อมูลยอดขาย
+router.get('/sales', async (req, res) => {
     try {
-        const pool = await poolPromise;
-        const { filterType, filterValue } = req.query;
-
-        // Query สำหรับดึงข้อมูลจากฐานข้อมูล
-        let query = `
+        const pool = await sql.connect(/* ข้อมูลการเชื่อมต่อกับ SQL Server */);
+        const result = await pool.request().query(`
             SELECT 
-                p.ProductName,
-                SUM(od.Quantity) as TotalSales,
-                SUM(od.Price * od.Quantity) as TotalRevenue,
-                (SUM(od.Price * od.Quantity) - SUM(p.CostPrice * od.Quantity)) as Profit
-            FROM Orders o
-            JOIN OrderDetails od ON o.OrderId = od.OrderId
-            JOIN Products p ON od.ProductId = p.ProductId
-            GROUP BY p.ProductName
-        `;
+                O.OrderDate, 
+                P.ProductName, 
+                OD.Quantity, 
+                (OD.Quantity * OD.Price) AS TotalPrice
+            FROM Orders O
+            JOIN OrderDetails OD ON O.OrderId = OD.OrderId
+            JOIN Products P ON OD.ProductId = P.ProductId
+            ORDER BY O.OrderDate DESC
+        `);
 
-        // ตรวจสอบเงื่อนไขการกรอง
-        if (filterType === 'highestPrice') {
-            query += ` ORDER BY TotalRevenue DESC`;
-        } else if (filterType === 'highestSales') {
-            query += ` ORDER BY TotalSales DESC`;
-        } else if (filterType === 'topProduct') {
-            query += ` WHERE p.ProductName = '${filterValue}'`;
-        }
-
-        const result = await pool.request().query(query);
-        res.json(result.recordset);
-    } catch (err) {
-        res.status(500).send(err.message);
+        res.status(200).json(result.recordset);  // ส่งข้อมูลยอดขายกลับไปยัง frontend
+    } catch (error) {
+        console.error('Error fetching sales data:', error);
+        res.status(500).json({ message: 'Error fetching sales data' });
     }
-};
+});
+
+module.exports = router;

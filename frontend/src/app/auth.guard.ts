@@ -8,7 +8,7 @@ import { AuthService } from './auth.service';
 export class AuthGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router) {}
 
-  canActivate(): boolean {
+  canActivate(p0: any, p1: any): boolean {
     if (this.authService.isLoggedIn()) {
       return true;  // อนุญาตให้เข้าถึงหน้าได้ถ้าล็อกอินอยู่
     } else {

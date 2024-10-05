@@ -39,3 +39,23 @@
     </section>
   </div>
 </div>
+<div>
+  <label for="filter">Filter by:</label>
+  <select id="filter" (change)="applyFilter($event)">
+    <option value="">Select Filter</option>
+    <option value="date">Date</option>
+    <option value="product">Product</option>
+    <!-- ตัวกรองอื่นๆ -->
+  </select>
+  
+</div>
+
+<table>
+  <!-- การแสดงข้อมูล salesData ในตาราง -->
+  <tr *ngFor="let sale of salesData">
+    <td>{{ sale.productName }}</td>
+    <td>{{ sale.saleDate }}</td>
+    <td>{{ sale.amount }}</td>
+    <!-- คอลัมน์อื่นๆ -->
+  </tr>
+</table>

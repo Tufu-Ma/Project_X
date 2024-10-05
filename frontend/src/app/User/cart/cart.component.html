@@ -1,0 +1,62 @@
+<div class="container mt-5">
+  <h2 class="text-center">My Cart</h2>
+
+  <!-- ตารางแสดงสินค้าของ Cart -->
+  <div class="row">
+    <div class="col-md-8">
+      <table class="table table-bordered">
+        <thead class="thead-light">
+          <tr>
+            <th>Product</th>
+            <th>Image</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of cartItems">
+            <td>{{ item.ProductName }}</td>
+            <td>
+              <img [src]="item.ImageUrl" alt="{{ item.ProductName }}" class="img-fluid" style="width: 50px; height: 50px;" />
+            </td>
+            <td>{{ item.Price | currency }}</td>
+            <td>
+              <div class="d-flex align-items-center">
+                <button class="btn btn-sm btn-outline-secondary" (click)="decreaseQuantity(item)">-</button>
+                <input type="number" class="form-control mx-2 text-center" [value]="item.Quantity" min="1" readonly style="width: 50px;" />
+                <button class="btn btn-sm btn-outline-secondary" (click)="increaseQuantity(item)">+</button>
+              </div>
+            </td>
+            <td>{{ item.Price * item.Quantity | currency }}</td>
+            <td>
+              <button class="btn btn-danger btn-sm" (click)="removeItem(item.CartId)">Remove</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Card Checkout -->
+    <div class="col-md-4">
+      <div class="card shadow rounded">
+        <div class="card-body">
+          <h5 class="card-title">Order Summary</h5>
+          <ul class="list-group mb-3">
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Items ({{ cartItems.length }})</span>
+              <strong>{{ total | currency }}</strong>
+            </li>
+            
+            <li class="list-group-item d-flex justify-content-between bg-light">
+              <strong>Total </strong>
+              <strong>{{ total| currency }}</strong>
+            </li>
+          </ul>
+          <button class="btn btn-primary btn-block" (click)="checkout()">Place Order</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
