@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ProductService {
   private apiUrl = 'http://localhost:3000/products';
-  private productAdminUrl = 'http://localhost:3000/products'; // URL สำหรับการจัดการสินค้า (Admin)
+  
 
 
   constructor(private http: HttpClient) { }

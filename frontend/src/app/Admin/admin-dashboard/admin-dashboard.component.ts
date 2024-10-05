@@ -21,17 +21,29 @@ export class AdminDashboardComponent implements OnInit {
   getSalesData(): void {
     this.salesService.getSalesData(this.filterType, this.filterValue).subscribe(
       (data) => {
-        this.salesData = data;
+        if (data && Array.isArray(data)) {
+          this.salesData = data;
+        } else {
+          Swal.fire('Error', 'Invalid sales data format', 'error');
+        }
       },
       (error) => {
+        console.error('Error fetching sales data:', error);
         Swal.fire('Error', 'Unable to fetch sales data', 'error');
       }
     );
   }
 
-  applyFilter(filterType: string, filterValue?: string): void {
+  applyFilter(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const filterType = selectElement.value;
+  
+    if (!filterType) {
+      Swal.fire('Warning', 'Please select a filter type', 'warning');
+      return;
+    }
+  
     this.filterType = filterType;
-    this.filterValue = filterValue || '';
     this.getSalesData();
-  }
+  }  
 }

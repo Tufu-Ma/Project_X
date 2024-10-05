@@ -1,0 +1,95 @@
+.table img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px; /* เส้นขอบโค้งมน */
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.list-group-item {
+  font-size: 1rem;
+  padding: 15px;
+}
+
+.list-group-item.bg-light {
+  font-weight: bold;
+}
+
+button.btn-primary {
+  background-color: #007bff;
+  border: none;
+  padding: 10px;
+  font-size: 1.2rem;
+}
+
+button.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+
+/* ปรับแต่งสไตล์ของตารางสินค้า */
+.table thead th {
+  background-color: #222831;
+  color: #fff;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.img-fluid {
+  max-width: 50px;
+  max-height: 50px;
+}
+
+/* Card Checkout */
+.card-body {
+  background-color: #222831;
+  padding: 20px;
+}
+
+.card-title {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+/* สไตล์สำหรับ Total */
+.total-highlight {
+  background-color: #ffeeba;
+  font-weight: bold;
+  font-size: 1.2rem;
+  padding: 20px;
+  border: 2px solid #079cff;
+}
+
+.total-amount {
+  font-size: 1.5rem;
+  color: #000000;
+}
+
+/* ปรับแต่งปุ่ม Checkout */
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+  padding: 10px;
+  font-size: 1.2rem;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}

@@ -88,24 +88,30 @@ decodeJWT(token: string): any {
   }
 
   // ฟังก์ชันสำหรับการดึง User ID จาก JWT Token
-getUserId(): string | null {
-  const token = this.getToken();
-  if (!token) {
-    console.log('No token found');
-    return null;
-  }
-
-  const decoded = this.decodeJWT(token);  // Decode JWT token
-  console.log('Decoded JWT Payload:', decoded);  // ตรวจสอบการ Decode token
+  getUserId(): number | null {
+    const token = this.getToken();
+    if (!token) {
+      console.log('No token found');
+      return null;
+    }
   
-  if (decoded && decoded.id) {
-    console.log('User ID:', decoded.id);  // Log เพื่อดูว่าดึง id มาได้หรือไม่
-    return decoded.id;  // Return userId
-  } else {
-    console.log('No User ID found in token');
-    return null;  // ถ้าไม่มี id ใน token, return null
+    const decoded = this.decodeJWT(token);  // Decode JWT token
+    console.log('Decoded JWT Payload:', decoded);  // ตรวจสอบการ Decode token
+    
+    if (decoded && decoded.id) {
+      console.log('User ID:', decoded.id);  // Log เพื่อตรวจสอบค่า id
+      const userId = Number(decoded.id);  // แปลงค่า id เป็น number
+      if (isNaN(userId)) {
+        console.error('User ID is not a valid number');
+        return null;  // ถ้าไม่ใช่ตัวเลข ให้ return null
+      }
+      return userId;  // ถ้าเป็นตัวเลข ให้ return userId
+    } else {
+      console.log('No User ID found in token');
+      return null;  // ถ้าไม่มี id ใน token, return null
+    }
   }
-}
+  
 
   // ฟังก์ชันสำหรับเพิ่มสินค้า (Admin)
   addProduct(
