@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OrderHistoryComponent } from './order-history.component';
+import { AdminHeaderComponent } from './admin-header.component';
 
-describe('OrderHistoryComponent', () => {
-  let component: OrderHistoryComponent;
-  let fixture: ComponentFixture<OrderHistoryComponent>;
+describe('AdminHeaderComponent', () => {
+  let component: AdminHeaderComponent;
+  let fixture: ComponentFixture<AdminHeaderComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [OrderHistoryComponent]
+      declarations: [AdminHeaderComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(OrderHistoryComponent);
+    fixture = TestBed.createComponent(AdminHeaderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

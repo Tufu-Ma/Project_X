@@ -20,6 +20,11 @@ export class OrdersService {
     return this.http.get<any>(`${this.apiUrl}/${orderId}`);
   }
 
+  // ดึงคำสั่งซื้อทั้งหมดตาม UserId
+  getOrdersByUserId(userId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}?userId=${userId}`); // ส่ง userId ใน query parameter
+  }
+
   // สร้างคำสั่งซื้อใหม่
   createOrder(orderData: any): Observable<any> {
     return this.http.post<any>(this.apiUrl, orderData);

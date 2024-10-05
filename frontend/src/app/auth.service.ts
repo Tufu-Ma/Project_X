@@ -1,20 +1,31 @@
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';  // นำเข้า Router
 import { isPlatformBrowser } from '@angular/common'; // นำเข้า isPlatformBrowser
+import { HeaderService } from './services/header.service';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  getUserRole(): string {
+    const token = this.getToken(); // ดึง token
+    if (!token) return ''; // คืนค่าว่างถ้าไม่มี token
+    const decoded = this.decodeJWT(token); // ถอดรหัส JWT
+    return decoded?.role || ''; // คืนค่าบทบาทจาก decoded payload
+}
+
   private apiUrl = 'http://localhost:3000/auth';  // URL สำหรับ backend สำหรับการ login, register, และ reset password
   private productAdminUrl = 'http://localhost:3000/products'; // URL สำหรับการจัดการสินค้า (Admin)
 
   constructor(
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object,  // Inject PLATFORM_ID
-    private router: Router) { }  // Inject Router
+    private router: Router,
+    private headerService: HeaderService // Inject HeaderService
+    ) { }  // Inject Router
 
   // Headers สำหรับ HTTP requests
   private jsonHeaders = {
@@ -32,8 +43,17 @@ export class AuthService {
   // ฟังก์ชันสำหรับการเข้าสู่ระบบ
   login(emailOrUsername: string, password: string): Observable<any> {
     const loginData = { emailOrUsername, password };
-    return this.http.post<any>(`${this.apiUrl}/login`, loginData, this.jsonHeaders);
-  }
+    return this.http.post<any>(`${this.apiUrl}/login`, loginData, this.jsonHeaders)
+      .pipe(
+        tap((response: { token: any; }) => {
+          const token = response.token; // สมมติว่า response มี token
+          this.saveToken(token); // บันทึก token
+          const role = this.getRoleFromToken(); // ดึง role จาก token
+          this.headerService.setAdminStatus(role === 'admin'); // เปลี่ยนสถานะเป็น admin
+        })
+      );
+}
+
 
   // ฟังก์ชันสำหรับการรีเซ็ตรหัสผ่าน
   resetPassword(email: string, phone: string, newPassword: string): Observable<any> {

@@ -27,7 +27,6 @@ import { AdminProductComponent } from './Admin/admin-product/admin-product.compo
 
 // User Components
 import { ProfileComponent } from './User/profile/profile.component';
-import { OrderHistoryComponent } from './User/order-history/order-history.component';
 import { ProductListComponent } from './User/product-list/product-list.component';
 
 // Services
@@ -36,6 +35,7 @@ import { ProductService } from './services/product.service';
 import { CartService } from './services/cart.service';
 import { CartComponent } from './User/cart/cart.component';
 import { OrdersComponent } from './User/orders/orders.component';
+import { AdminHeaderComponent } from './Admin/admin-header/admin-header.component';
 
 
 // กำหนดเส้นทางของแอปพลิเคชัน
@@ -76,10 +76,10 @@ const routes: Routes = [
 
     // User Components
     ProfileComponent,
-    OrderHistoryComponent,
     ProductListComponent,
     CartComponent,
     OrdersComponent,
+    AdminHeaderComponent,
   ],
   imports: [
     BrowserModule,

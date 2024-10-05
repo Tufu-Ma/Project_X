@@ -1,20 +1,20 @@
 <header class="p-1 mb-3 border-bottom">
   <div class="container">
     <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-      <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">
+      <a routerLink="/" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">
         <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap">
           <use xlink:href="#bootstrap"></use>
         </svg>
       </a>
       <div routerLink="/home">
-        <img
-          src="https://media.discordapp.net/attachments/1275377791839240282/1279774263833923584/pimsubgear.png?ex=66eb6ae9&is=66ea1969&hm=dac350e4775cd6f740408ba33f34951bda8180b5d898dada3fd48331efab17ea&=&format=webp&quality=lossless&width=413&height=437">
+        <img src="https://media.discordapp.net/attachments/1275377791839240282/1279774263833923584/pimsubgear.png?ex=66eb6ae9&is=66ea1969&hm=dac350e4775cd6f740408ba33f34951bda8180b5d898dada3fd48331efab17ea&=&format=webp&quality=lossless&width=413&height=437" alt="Logo">
       </div>
       <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-        <li><a href="#" class="nav-link px-3 link-secondary" routerLink="/home">Home</a></li>
-        <li><a href="#" class="nav-link px-3 link-body-emphasis" routerLink="/product-list">Product</a></li>
-        <li><a href="#" class="nav-link px-3 link-body-emphasis" routerLink="/about-us">About us</a></li>
-        <li><a href="#" class="nav-link px-3 link-body-emphasis" routerLink="/contact-us">Contact</a></li>
+        <li><a class="nav-link px-3 link-secondary" routerLink="/home">Home</a></li>
+        <li><a class="nav-link px-3 link-body-emphasis" routerLink="/product-list">Product</a></li>
+        <li><a class="nav-link px-3 link-body-emphasis" routerLink="/about-us">About us</a></li>
+        <li><a class="nav-link px-3 link-body-emphasis" routerLink="/contact-us">Contact</a></li>
+        <li *ngIf="isAdmin"><a class="nav-link px-3 link-body-emphasis" routerLink="/admin">Admin Dashboard</a></li> <!-- แสดงเฉพาะเมื่อเป็น admin -->
       </ul>
 
       <form class="form-inline my-2 my-lg-0" (ngSubmit)="onSearch()">
@@ -26,26 +26,23 @@
         </div>
       </form>
 
-      <a routerLink="/cart">
+      <a routerLink="/cart" class="ms-3">
         <i class="bi bi-cart2"></i>
       </a>
 
-      <!-- ตรวจสอบว่าผู้ใช้ล็อกอินหรือยัง -->
       <ng-container *ngIf="authService.isLoggedIn(); else notLoggedIn">
-        <!-- ถ้าล็อกอินแล้ว แสดงรูปโปรไฟล์และ dropdown -->
         <div class="dropdown">
           <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
             <img src="assets/profile-icon.png" alt="Profile" width="30" height="30">
           </a>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-            <li><a class="dropdown-item" routerLink="/order-history">ประวัติการซื้อ</a></li>
+            <li><a class="dropdown-item" routerLink="/orders">ประวัติการซื้อ</a></li>
             <li><a class="dropdown-item" routerLink="/payment-history">ประวัติการจ่ายเงิน</a></li>
             <li><a class="dropdown-item" (click)="logout()">ล็อกเอาต์</a></li>
           </ul>
         </div>
       </ng-container>
 
-      <!-- ถ้ายังไม่ได้ล็อกอิน แสดงปุ่ม "เข้าสู่ระบบ" -->
       <ng-template #notLoggedIn>
         <button type="submit" class="signin-button" routerLink="/login">เข้าสู่ระบบ</button>
       </ng-template>

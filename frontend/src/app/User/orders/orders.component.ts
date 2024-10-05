@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { OrdersService } from '../../services/order.service';
 import { AuthService } from '../../auth.service';
 
-
 @Component({
   selector: 'app-orders',
   templateUrl: './orders.component.html',
@@ -12,29 +11,37 @@ export class OrdersComponent implements OnInit {
   orders: any[] = [];
   selectedOrder: any = null;
 
-  constructor(private ordersService: OrdersService,private authService: AuthService) {}
+  constructor(private ordersService: OrdersService, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.fetchOrders();
   }
 
-  // ดึงข้อมูลคำสั่งซื้อทั้งหมด
+  // ดึงข้อมูลคำสั่งซื้อเฉพาะของผู้ใช้ที่เข้าสู่ระบบ
   fetchOrders() {
     if (!this.authService.isLoggedIn()) {
       console.error('User not authorized to view orders.');
+      alert('คุณต้องเข้าสู่ระบบเพื่อดูคำสั่งซื้อของคุณ.');
       return;
     }
   
-    this.ordersService.getOrders().subscribe(
-      (data) => {
-        this.orders = data;
-      },
-      (error) => {
-        console.error('Error fetching orders:', error);
-      }
-    );
-  }
+    const userId = this.authService.getUserId(); // ดึง ID ของผู้ใช้จาก AuthService
   
+    if (userId !== null && typeof userId === 'number') {
+      this.ordersService.getOrdersByUserId(userId).subscribe(
+        (data) => {
+          this.orders = data; // กำหนดคำสั่งซื้อที่ดึงมาได้ให้กับอาร์เรย์ orders
+        },
+        (error) => {
+          console.error('Error fetching orders:', error);
+          alert('ไม่สามารถดึงข้อมูลคำสั่งซื้อได้ กรุณาลองอีกครั้งในภายหลัง.');
+        }
+      );
+    } else {
+      console.error('User ID is null or invalid, cannot fetch orders.');
+      alert('ID ของผู้ใช้ไม่ถูกต้อง กรุณาเข้าสู่ระบบอีกครั้ง.');
+    }
+  }
 
   // ดึงข้อมูลคำสั่งซื้อตาม ID
   viewOrderDetails(orderId: number) {

@@ -1,0 +1,45 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+    color: #ffffff;
+}
+
+img {
+    width: 5rem;
+    cursor: pointer;
+}
+.social-media {
+    margin-top: 10px;
+}
+
+.social-media a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.social-media a:hover {
+    color: #007bff;
+}
+
+.signin-button {
+    padding: 8px 10px;
+    background-color: #1A73E8;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+.bi-cart2 {
+    font-size: 25px;
+    padding: 0px 40px 5px 20px;
+    cursor: pointer;
+}
+
+.form-control {
+    width: 400px;
+}
