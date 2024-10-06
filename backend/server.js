@@ -5,7 +5,8 @@ const checkConnection = require('./utils/db'); // ฟังก์ชันเช
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const cartRoutes = require('./routes/cart');
-const orderRouter = require('./routes/order');  // นำเข้า router สำหรับ order
+const orderRoutes = require('./routes/order'); // ระบุ path ที่ถูกต้อง
+const chartRoutes = require('./routes/chart');
 const app = express();
 
 app.use(bodyParser.json());
@@ -18,7 +19,8 @@ app.use('/uploads', express.static('uploads'));
 app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
 app.use("/cart", cartRoutes);
-app.use(orderRouter);  // ใช้ router สำหรับ order
+app.use("/orders", orderRoutes);  // เปลี่ยนเส้นทางเป็น /orders
+app.use('/chart', chartRoutes);
 
 // เช็คการเชื่อมต่อกับ SQL Server และเริ่มเซิร์ฟเวอร์
 checkConnection().then(() => {

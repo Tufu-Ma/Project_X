@@ -4,7 +4,7 @@ const router = express.Router();
 const checkConnection = require('../utils/db'); // นำเข้า connection database
 
 // สร้าง order ใหม่
-router.post('/orders', async (req, res) => {
+router.post('/', async (req, res) => {
     const { UserId, TotalAmount, OrderStatus } = req.body;
 
     // ตรวจสอบว่าข้อมูลที่จำเป็นถูกส่งมา
@@ -18,8 +18,8 @@ router.post('/orders', async (req, res) => {
             .input('UserId', sql.Int, UserId)
             .input('TotalAmount', sql.Decimal(10, 2), TotalAmount)
             .input('OrderStatus', sql.NVarChar(50), OrderStatus || 'Pending')
-            .query(`INSERT INTO Orders (UserId, TotalAmount, OrderStatus) 
-                    VALUES (@UserId, @TotalAmount, @OrderStatus); 
+            .query(`INSERT INTO Orders (UserId, TotalAmount, OrderStatus, CreatedDate) 
+                    VALUES (@UserId, @TotalAmount, @OrderStatus, GETDATE()); 
                     SELECT SCOPE_IDENTITY() AS OrderId;`);
         
         const orderId = result.recordset[0].OrderId;
@@ -31,24 +31,21 @@ router.post('/orders', async (req, res) => {
 });
 
 // รับข้อมูล order ทั้งหมด หรือคำสั่งซื้อตาม UserId
-router.get('/orders', async (req, res) => {
+router.get('/', async (req, res) => {
     const userId = req.query.userId; // รับ userId จาก query
 
     try {
         const pool = await checkConnection();
-        let result;
+        let query = 'SELECT * FROM Orders';
+        let request = pool.request();
 
         // ตรวจสอบว่ามี userId หรือไม่
         if (userId) {
-            // ถ้ามี userId ให้กรองคำสั่งซื้อเฉพาะของผู้ใช้
-            result = await pool.request()
-                .input('UserId', sql.Int, userId)
-                .query('SELECT * FROM Orders WHERE UserId = @UserId');
-        } else {
-            // ถ้าไม่มี userId ให้ดึงคำสั่งซื้อทั้งหมด
-            result = await pool.request().query('SELECT * FROM Orders');
+            query += ' WHERE UserId = @UserId';
+            request = request.input('UserId', sql.Int, userId);
         }
 
+        const result = await request.query(query);
         res.status(200).json(result.recordset);
     } catch (err) {
         console.error('Error fetching orders:', err);
@@ -57,7 +54,7 @@ router.get('/orders', async (req, res) => {
 });
 
 // รับข้อมูล order ตาม ID
-router.get('/orders/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
 
     // ตรวจสอบว่า id เป็นจำนวนเต็มหรือไม่
@@ -74,7 +71,7 @@ router.get('/orders/:id', async (req, res) => {
         if (result.recordset.length === 0) {
             return res.status(404).json({ message: 'Order not found' });
         }
-        
+
         res.status(200).json(result.recordset[0]);
     } catch (err) {
         console.error('Error fetching order:', err);
@@ -83,7 +80,7 @@ router.get('/orders/:id', async (req, res) => {
 });
 
 // อัปเดตสถานะ order
-router.put('/orders/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { OrderStatus } = req.body;
 
@@ -109,7 +106,7 @@ router.put('/orders/:id', async (req, res) => {
 });
 
 // ลบ order ตาม ID
-router.delete('/orders/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
