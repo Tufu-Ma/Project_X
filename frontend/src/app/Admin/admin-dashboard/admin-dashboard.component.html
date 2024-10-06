@@ -18,6 +18,7 @@
 
       <div class="stat-card">
         <h3>Best Selling Products</h3>
+        <!-- ตรวจสอบก่อนว่าข้อมูล bestSellingChartData พร้อมหรือยัง -->
         <canvas *ngIf="bestSellingChartData" baseChart
           [datasets]="bestSellingChartData.datasets"
           [labels]="bestSellingChartData.labels"
@@ -29,6 +30,7 @@
 
       <div class="stat-card">
         <h3>Worst Selling Products</h3>
+        <!-- ตรวจสอบก่อนว่าข้อมูล worstSellingChartData พร้อมหรือยัง -->
         <canvas *ngIf="worstSellingChartData" baseChart
           [datasets]="worstSellingChartData.datasets"
           [labels]="worstSellingChartData.labels"
