@@ -1,17 +1,28 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SalesService {
-  private apiUrl = 'http://localhost:3000/api/sales';
 
-  constructor(private http: HttpClient) {}
+  private apiUrl = 'http://localhost:3000/chart';  // URL ของ API
 
-  getSalesData(filterType: string, filterValue: string): Observable<any> {
-    let params = new HttpParams().set('filterType', filterType).set('filterValue', filterValue);
-    return this.http.get<any>(this.apiUrl, { params });
+  constructor(private http: HttpClient) { }
+
+  // ฟังก์ชันเพื่อดึงข้อมูล OrderItems
+  getOrderItems(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/order-items`);
+  }
+
+  // ฟังก์ชันเพื่อดึงสินค้าที่ขายดีที่สุด
+  getBestSellingProducts(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/best-selling-products`);
+  }
+
+  // ฟังก์ชันเพื่อดึงสินค้าที่ขายได้น้อยที่สุด
+  getWorstSellingProducts(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/worst-selling-products`);
   }
 }

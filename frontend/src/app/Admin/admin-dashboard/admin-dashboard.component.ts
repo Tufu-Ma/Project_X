@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ChartType } from 'chart.js';  // นำเข้า ChartType จาก chart.js
 import { SalesService } from '../../services/sales.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -8,42 +8,47 @@ import Swal from 'sweetalert2';
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
-  salesData: any[] = [];
-  filterType: string = '';
-  filterValue: string = '';
+  totalSales = 0;
+  bestSellingProducts: any[] = [];
+  worstSellingProducts: any[] = [];
+
+  bestSellingChartData: any;
+  worstSellingChartData: any;
+
+  chartOptions = {
+    responsive: true
+  };
+  chartLegend = true;
+  chartType: ChartType = 'bar';  // กำหนดชนิดของกราฟเป็น ChartType
 
   constructor(private salesService: SalesService) {}
 
   ngOnInit(): void {
-    this.getSalesData();
+    this.fetchDashboardData();
   }
 
-  getSalesData(): void {
-    this.salesService.getSalesData(this.filterType, this.filterValue).subscribe(
-      (data) => {
-        if (data && Array.isArray(data)) {
-          this.salesData = data;
-        } else {
-          Swal.fire('Error', 'Invalid sales data format', 'error');
+  fetchDashboardData(): void {
+    this.salesService.getBestSellingProducts().subscribe((data: any) => {
+      this.bestSellingProducts = data;
+      this.bestSellingChartData = this.mapChartData(data);
+    });
+
+    this.salesService.getWorstSellingProducts().subscribe((data: any) => {
+      this.worstSellingProducts = data;
+      this.worstSellingChartData = this.mapChartData(data);
+    });
+  }
+
+  private mapChartData(data: any): any {
+    return {
+      labels: data.map((item: any) => item.ProductId),  // ปรับตามข้อมูลจากตาราง OrderItems
+      datasets: [
+        {
+          data: data.map((item: any) => item.TotalQuantity),  // ใช้ TotalQuantity เป็นข้อมูลกราฟ
+          label: 'Total Sales',
+          backgroundColor: 'rgba(75, 192, 192, 0.6)'
         }
-      },
-      (error) => {
-        console.error('Error fetching sales data:', error);
-        Swal.fire('Error', 'Unable to fetch sales data', 'error');
-      }
-    );
+      ]
+    };
   }
-
-  applyFilter(event: Event): void {
-    const selectElement = event.target as HTMLSelectElement;
-    const filterType = selectElement.value;
-  
-    if (!filterType) {
-      Swal.fire('Warning', 'Please select a filter type', 'warning');
-      return;
-    }
-  
-    this.filterType = filterType;
-    this.getSalesData();
-  }  
 }

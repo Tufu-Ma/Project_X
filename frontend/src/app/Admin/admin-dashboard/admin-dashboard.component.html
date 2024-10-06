@@ -2,60 +2,71 @@
 <div class="dashboard-container">
   <nav class="sidebar">
     <ul>
-      <li><a href="#">Dashboard</a></li>
-      <li><a href="#">Orders</a></li>
+      <li><a routerLink="/admin-dashboard">Dashboard</a></li>
       <li><a routerLink="/home">Products</a></li>
-      <li><a href="#">Users</a></li>
-      <li><a href="#">Reports</a></li>
+      <li><a routerLink="/admin-reports">Reports</a></li>
       <li><a routerLink="/admin-product">Product Management</a></li>
     </ul>
   </nav>
 
   <div class="main-content">
-    <header class="top-bar">
-      <div class="profile-section">
-        <span>Admin</span>
-        <button class="logout-btn">Logout</button>
-      </div>
-    </header>
-
     <section class="stats-overview">
       <div class="stat-card">
         <h3>Total Sales</h3>
-        <p>$50,000</p>
+        <p>${{ totalSales }}</p>
       </div>
+
       <div class="stat-card">
-        <h3>New Orders</h3>
-        <p>120</p>
+        <h3>Best Selling Products</h3>
+        <canvas *ngIf="bestSellingChartData" baseChart
+          [datasets]="bestSellingChartData.datasets"
+          [labels]="bestSellingChartData.labels"
+          [options]="chartOptions"
+          [legend]="chartLegend"
+          [type]="chartType">
+        </canvas>
       </div>
+
       <div class="stat-card">
-        <h3>Active Users</h3>
-        <p>350</p>
-      </div>
-      <div class="stat-card">
-        <h3>Revenue</h3>
-        <p>$5,000</p>
+        <h3>Worst Selling Products</h3>
+        <canvas *ngIf="worstSellingChartData" baseChart
+          [datasets]="worstSellingChartData.datasets"
+          [labels]="worstSellingChartData.labels"
+          [options]="chartOptions"
+          [legend]="chartLegend"
+          [type]="chartType">
+        </canvas>
       </div>
     </section>
+
+    <!-- ตารางข้อมูลสินค้าขายดี -->
+    <h3>Best Selling Products Table</h3>
+    <table>
+      <tr>
+        <th>Product Name</th>
+        <th>Total Quantity Sold</th>
+        <th>Total Sales</th>
+      </tr>
+      <tr *ngFor="let product of bestSellingProducts">
+        <td>{{ product.productName }}</td>
+        <td>{{ product.totalQuantity }}</td>
+        <td>{{ product.totalSales | currency }}</td>
+      </tr>
+    </table>
+
+    <!-- ตารางข้อมูลสินค้าขายไม่ดี -->
+    <h3>Worst Selling Products Table</h3>
+    <table>
+      <tr>
+        <th>Product Name</th>
+        <th>Total Quantity Sold</th>
+        <th>Total Sales</th>
+      </tr>
+      <tr *ngFor="let product of worstSellingProducts">
+        <td>{{ product.productName }}</td>
+        <td>{{ product.totalQuantity }}</td>
+        <td>{{ product.totalSales | currency }}</td>
+      </tr>
+    </table>
   </div>
 </div>
-<div>
-  <label for="filter">Filter by:</label>
-  <select id="filter" (change)="applyFilter($event)">
-    <option value="">Select Filter</option>
-    <option value="date">Date</option>
-    <option value="product">Product</option>
-    <!-- ตัวกรองอื่นๆ -->
-  </select>
-  
-</div>
-
-<table>
-  <!-- การแสดงข้อมูล salesData ในตาราง -->
-  <tr *ngFor="let sale of salesData">
-    <td>{{ sale.productName }}</td>
-    <td>{{ sale.saleDate }}</td>
-    <td>{{ sale.amount }}</td>
-    <!-- คอลัมน์อื่นๆ -->
-  </tr>
-</table>

@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
+import { NgChartsModule } from 'ng2-charts';
 
 // Shared Components
 import { LoginComponent } from './Shared/login/login.component';
@@ -35,7 +36,6 @@ import { ProductService } from './services/product.service';
 import { CartService } from './services/cart.service';
 import { CartComponent } from './User/cart/cart.component';
 import { OrdersComponent } from './User/orders/orders.component';
-import { AdminHeaderComponent } from './Admin/admin-header/admin-header.component';
 
 
 // กำหนดเส้นทางของแอปพลิเคชัน
@@ -79,7 +79,6 @@ const routes: Routes = [
     ProductListComponent,
     CartComponent,
     OrdersComponent,
-    AdminHeaderComponent,
   ],
   imports: [
     BrowserModule,
@@ -88,6 +87,7 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
+    NgChartsModule,
   ],
   providers: [AuthService, ProductService, CartService],
   bootstrap: [AppComponent]
