@@ -13,12 +13,12 @@
     <section class="stats-overview">
       <div class="stat-card">
         <h3>Total Sales</h3>
-        <p>${{ totalSales }}</p>
+        <p>{{ totalSales | currency }}</p> <!-- แก้ไขการแสดงผลยอดขายทั้งหมด -->
       </div>
 
       <div class="stat-card">
         <h3>Best Selling Products</h3>
-        <!-- ตรวจสอบก่อนว่าข้อมูล bestSellingChartData พร้อมหรือยัง -->
+        <!-- ตรวจสอบว่าข้อมูล bestSellingChartData พร้อมใช้งานหรือไม่ -->
         <canvas *ngIf="bestSellingChartData" baseChart
           [datasets]="bestSellingChartData.datasets"
           [labels]="bestSellingChartData.labels"
@@ -30,7 +30,7 @@
 
       <div class="stat-card">
         <h3>Worst Selling Products</h3>
-        <!-- ตรวจสอบก่อนว่าข้อมูล worstSellingChartData พร้อมหรือยัง -->
+        <!-- ตรวจสอบว่าข้อมูล worstSellingChartData พร้อมใช้งานหรือไม่ -->
         <canvas *ngIf="worstSellingChartData" baseChart
           [datasets]="worstSellingChartData.datasets"
           [labels]="worstSellingChartData.labels"
@@ -44,31 +44,39 @@
     <!-- ตารางข้อมูลสินค้าขายดี -->
     <h3>Best Selling Products Table</h3>
     <table>
-      <tr>
-        <th>Product Name</th>
-        <th>Total Quantity Sold</th>
-        <th>Total Sales</th>
-      </tr>
-      <tr *ngFor="let product of bestSellingProducts">
-        <td>{{ product.productName }}</td>
-        <td>{{ product.totalQuantity }}</td>
-        <td>{{ product.totalSales | currency }}</td>
-      </tr>
+      <thead>
+        <tr>
+          <th>Product Name</th>
+          <th>Total Quantity Sold</th>
+          <th>Total Sales</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of bestSellingProducts">
+          <td>{{ product.ProductName }}</td> <!-- ใช้ ProductName จากฐานข้อมูล -->
+          <td>{{ product.TotalQuantity }}</td> <!-- ใช้ TotalQuantity จากฐานข้อมูล -->
+          <td>{{ product.TotalSales | currency }}</td> <!-- ใช้ TotalSales จากฐานข้อมูล -->
+        </tr>
+      </tbody>
     </table>
 
     <!-- ตารางข้อมูลสินค้าขายไม่ดี -->
     <h3>Worst Selling Products Table</h3>
     <table>
-      <tr>
-        <th>Product Name</th>
-        <th>Total Quantity Sold</th>
-        <th>Total Sales</th>
-      </tr>
-      <tr *ngFor="let product of worstSellingProducts">
-        <td>{{ product.productName }}</td>
-        <td>{{ product.totalQuantity }}</td>
-        <td>{{ product.totalSales | currency }}</td>
-      </tr>
+      <thead>
+        <tr>
+          <th>Product Name</th>
+          <th>Total Quantity Sold</th>
+          <th>Total Sales</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of worstSellingProducts">
+          <td>{{ product.ProductName }}</td> <!-- ใช้ ProductName จากฐานข้อมูล -->
+          <td>{{ product.TotalQuantity }}</td> <!-- ใช้ TotalQuantity จากฐานข้อมูล -->
+          <td>{{ product.TotalSales | currency }}</td> <!-- ใช้ TotalSales จากฐานข้อมูล -->
+        </tr>
+      </tbody>
     </table>
   </div>
 </div>
