@@ -2,6 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ChartType } from 'chart.js';  // นำเข้า ChartType จาก chart.js
 import { SalesService } from '../../services/sales.service';
 
+// สร้างอินเทอร์เฟซสำหรับข้อมูลผลิตภัณฑ์
+interface Product {
+  ProductName: string;
+  TotalQuantity: number;
+  TotalSales: number;
+}
+
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
@@ -9,17 +16,23 @@ import { SalesService } from '../../services/sales.service';
 })
 export class AdminDashboardComponent implements OnInit {
   totalSales = 0;
-  bestSellingProducts: any[] = [];
-  worstSellingProducts: any[] = [];
+  bestSellingProducts: Product[] = [];
+  worstSellingProducts: Product[] = [];
+  totalSalesData: any[] = [];  // สำหรับตารางยอดขายรวม
 
   bestSellingChartData: any;
   worstSellingChartData: any;
+  totalSalesChartData: any;  // สำหรับกราฟยอดขายรวม
 
   chartOptions = {
     responsive: true
   };
   chartLegend = true;
-  chartType: ChartType = 'bar';  // ใช้ชนิด ChartType จาก chart.js โดยกำหนดเป็น 'bar'
+  
+  // กำหนดชนิดของกราฟ
+  totalSalesChartType: ChartType = 'line';  // กราฟยอดขายรวมเป็นเส้น
+  bestSellingChartType: ChartType = 'bar';   // กราฟสินค้าขายดีเป็นแท่ง
+  worstSellingChartType: ChartType = 'bar';   // กราฟสินค้าขายไม่ดีเป็นแท่ง
 
   constructor(private salesService: SalesService) {}
 
@@ -28,34 +41,37 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   fetchDashboardData(): void {
-    // ดึงข้อมูลสินค้าขายดีที่สุด
-    this.salesService.getBestSellingProducts().subscribe((data: any) => {
-      this.bestSellingProducts = data;
-      this.bestSellingChartData = this.mapChartData(data);
+    // ดึงข้อมูลยอดขายรวม
+    this.salesService.getTotalSales().subscribe((data: any) => {
+      this.totalSales = data.totalSales;  // แสดงผลรวมยอดขายทั้งหมด
+      this.totalSalesData = data.sales;    // ข้อมูลตารางยอดขาย
+      this.totalSalesChartData = this.mapChartData(data.sales, 'total');  // สร้างข้อมูลสำหรับกราฟยอดขายรวม
     });
-
-    // ดึงข้อมูลสินค้าขายได้น้อยที่สุด
-    this.salesService.getWorstSellingProducts().subscribe((data: any) => {
-      this.worstSellingProducts = data;
-      this.worstSellingChartData = this.mapChartData(data);
+  
+    // ดึงข้อมูลสินค้าที่ขายดีที่สุด
+    this.salesService.getBestSellingProducts().subscribe((data: Product[]) => {
+      this.bestSellingProducts = data.sort((a: Product, b: Product) => b.TotalSales - a.TotalSales); // เรียงตามยอดขาย
+      this.bestSellingChartData = this.mapChartData(this.bestSellingProducts, 'TotalSales');  // สร้างข้อมูลสำหรับกราฟสินค้าขายดี
+    });
+  
+    // ดึงข้อมูลสินค้าที่ขายไม่ดี
+    this.salesService.getWorstSellingProducts().subscribe((data: Product[]) => {
+      this.worstSellingProducts = data.sort((a: Product, b: Product) => a.TotalSales - b.TotalSales); // เรียงตามยอดขาย
+      this.worstSellingChartData = this.mapChartData(this.worstSellingProducts, 'TotalSales');  // สร้างข้อมูลสำหรับกราฟสินค้าขายไม่ดี
     });
   }
-
-  // แปลงข้อมูลเพื่อใช้กับกราฟ
-  private mapChartData(data: any): any {
-    if (data && data.length > 0) {
-      return {
-        labels: data.map((item: any) => item.ProductName),  // ใช้ ProductName เป็น label
-        datasets: [
-          {
-            data: data.map((item: any) => item.TotalQuantity),  // ใช้ TotalQuantity เป็นข้อมูลกราฟ
-            label: 'Total Quantity Sold',
-            backgroundColor: 'rgba(75, 192, 192, 0.6)'
-          }
-        ]
-      };
-    } else {
-      return null;  // ถ้าไม่มีข้อมูลให้ส่ง null กลับ
-    }
+  
+  private mapChartData(data: any, valueField: string): any {
+    console.log("Data for chart:", data); // ตรวจสอบข้อมูลที่ส่งไป
+    return {
+      labels: data.map((item: any) => item.ProductName || item.date),
+      datasets: [
+        {
+          data: data.map((item: any) => item[valueField]),
+          label: valueField === 'TotalSales' ? 'Total Sales' : 'Sales Quantity',
+          backgroundColor: valueField === 'TotalSales' ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)',
+        }
+      ]
+    };
   }
 }

@@ -50,4 +50,24 @@ router.get('/worst-selling-products', async (req, res) => {
   }
 });
 
+router.get('/sales-summary', async (req, res) => {
+    try {
+      const pool = await checkConnection();
+      const result = await pool.request().query(`
+        SELECT CAST(O.OrderDate AS DATE) AS date, SUM(OI.TotalAmount) AS total
+        FROM OrderItems OI
+        JOIN Orders O ON OI.OrderId = O.OrderId
+        GROUP BY CAST(O.OrderDate AS DATE)
+        ORDER BY date
+      `);
+  
+      const totalSales = result.recordset.reduce((sum, item) => sum + item.total, 0);
+      res.json({ totalSales, sales: result.recordset }); // ส่งยอดขายรวมและข้อมูลยอดขายตามวัน
+    } catch (err) {
+      console.error('Error fetching sales summary:', err);
+      res.status(500).json({ message: 'Error fetching sales summary', error: err.message });
+    }
+  });
+  
+
 module.exports = router;

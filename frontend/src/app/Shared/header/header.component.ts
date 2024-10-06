@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductService } from '../../services/product.service'; // นำเข้า ProductService
 import { AuthService } from '../../auth.service';  // ใช้ AuthService สำหรับตรวจสอบการล็อกอิน
@@ -14,17 +14,27 @@ export class HeaderComponent {
   searchTerm: string = '';  // เพิ่มตัวแปร searchTerm
   suggestions: any[] = [];  // เพิ่มตัวแปร suggestions
   isAdmin: boolean = false;
-  // Inject ProductService และ Router เข้ามาใน constructor
-  constructor(public authService: AuthService,private router: Router, private productService: ProductService,private headerService: HeaderService) {}
+
+  // Inject ProductService, Router และ ChangeDetectorRef เข้ามาใน constructor
+  constructor(
+    public authService: AuthService,
+    private router: Router,
+    private productService: ProductService,
+    private headerService: HeaderService,
+    private cd: ChangeDetectorRef // เพิ่ม ChangeDetectorRef เพื่อบังคับการตรวจสอบ
+  ) {}
 
   ngOnInit() {
+    // ตรวจสอบบทบาทของผู้ใช้จาก AuthService
+    const userRole = this.authService.getUserRole();
+    this.isAdmin = userRole === 'Admin'; // เปลี่ยนเป็น true ถ้าเป็น Admin
+    
+    // เช็คจาก HeaderService ถ้าใช้
     this.headerService.isAdmin$.subscribe(isAdmin => {
-      this.isAdmin = isAdmin; // รับสถานะ admin
+      this.isAdmin = isAdmin;
+      this.cd.detectChanges(); // บังคับให้ Angular ตรวจสอบการเปลี่ยนแปลง
     });
-  
-    this.isAdmin = this.authService.getUserRole() === 'admin'; // กำหนดสถานะ admin
   }
-  
 
   // ฟังก์ชัน onSearchInput ที่ทำงานเมื่อผู้ใช้พิมพ์ในแถบค้นหา
   onSearchInput(): void {
@@ -56,6 +66,7 @@ export class HeaderComponent {
     this.onSearch();
   }
 
+  // ฟังก์ชัน logout สำหรับการล็อกเอาต์
   logout(): void {
     this.authService.logout();  // ล้างข้อมูลการล็อกอิน
     this.headerService.setAdminStatus(false); // รีเซ็ตสถานะผู้ดูแลระบบ

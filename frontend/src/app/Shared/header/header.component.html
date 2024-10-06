@@ -1,4 +1,5 @@
-<header class="p-1 mb-3 border-bottom">
+<header class="p-1 mb-3 border-bottom" *ngIf="!isAdmin"> 
+  <!-- Header สำหรับ User -->
   <div class="container">
     <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
       <a routerLink="/" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">
@@ -7,14 +8,13 @@
         </svg>
       </a>
       <div routerLink="/home">
-        <img src="https://media.discordapp.net/attachments/1275377791839240282/1279774263833923584/pimsubgear.png?ex=66eb6ae9&is=66ea1969&hm=dac350e4775cd6f740408ba33f34951bda8180b5d898dada3fd48331efab17ea&=&format=webp&quality=lossless&width=413&height=437" alt="Logo">
+        <img src="https://media.discordapp.net/attachments/1275377791839240282/1279774263833923584/pimsubgear.png" alt="Logo">
       </div>
       <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
         <li><a class="nav-link px-3 link-secondary" routerLink="/home">Home</a></li>
         <li><a class="nav-link px-3 link-body-emphasis" routerLink="/product-list">Product</a></li>
         <li><a class="nav-link px-3 link-body-emphasis" routerLink="/about-us">About us</a></li>
         <li><a class="nav-link px-3 link-body-emphasis" routerLink="/contact-us">Contact</a></li>
-        <li *ngIf="isAdmin"><a class="nav-link px-3 link-body-emphasis" routerLink="/admin">Admin Dashboard</a></li> <!-- แสดงเฉพาะเมื่อเป็น admin -->
       </ul>
 
       <form class="form-inline my-2 my-lg-0" (ngSubmit)="onSearch()">
@@ -49,3 +49,51 @@
     </div>
   </div>
 </header>
+
+<header class="p-1 mb-3 border-bottom" *ngIf="isAdmin"> 
+  <!-- Header สำหรับ Admin -->
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-between">
+      <!-- Logo -->
+      <div class="d-flex align-items-center">
+        <a routerLink="/" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">
+          <img src="path_to_logo.png" alt="Logo" width="40"> <!-- ลดขนาดโลโก้ -->
+        </a>
+      </div>
+      <!-- Navigation Links -->
+      <ul class="nav col-lg-auto mb-2 justify-content-center mb-md-0 d-flex align-items-center">
+        <li><a class="nav-link px-2 link-secondary" routerLink="/admin">Admin Dashboard</a></li>
+        <li><a class="nav-link px-2 link-body-emphasis" routerLink="/admin-product">Manage Products</a></li>
+        <li><a class="nav-link px-2 link-body-emphasis" routerLink="/manage-orders">Manage Orders</a></li>
+        <li><a class="nav-link px-2 link-body-emphasis" routerLink="/home">Web Home</a></li>
+      </ul>
+      <!-- Search Form -->
+      <form class="form-inline d-flex align-items-center my-2 my-lg-0 flex-grow-1" style="max-width: 400px;" (ngSubmit)="onSearch()"> <!-- จำกัดขนาดช่องค้นหา -->
+        <input class="form-control me-2" type="search" placeholder="Search products" [(ngModel)]="searchTerm" name="search" style="flex-grow: 1;">
+        <button class="btn btn-primary" type="submit">ค้นหา</button>
+      </form>
+      <!-- Cart and Profile -->
+      <div class="d-flex align-items-center">
+        <a routerLink="/cart" class="ms-2">
+          <i class="bi bi-cart2"></i>
+        </a>
+        <ng-container *ngIf="authService.isLoggedIn(); else notLoggedIn">
+          <div class="dropdown ms-2">
+            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="assets/profile-icon.png" alt="Profile" width="30" height="30">
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+              <li><a class="dropdown-item" routerLink="/orders">ประวัติการซื้อ</a></li>
+              <li><a class="dropdown-item" routerLink="/payment-history">ประวัติการจ่ายเงิน</a></li>
+              <li><a class="dropdown-item" (click)="logout()">ล็อกเอาต์</a></li>
+            </ul>
+          </div>
+        </ng-container>
+        <ng-template #notLoggedIn>
+          <button type="submit" class="signin-button btn btn-primary ms-2" routerLink="/login">เข้าสู่ระบบ</button>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</header>
+
