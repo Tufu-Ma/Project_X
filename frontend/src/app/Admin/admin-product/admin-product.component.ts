@@ -42,8 +42,16 @@ export class AdminProductComponent implements OnInit {
   }
 
   onFileSelected(event: any): void {
-    this.selectedFile = event.target.files[0];
+    const file: File = event.target.files[0];
+    
+    if (file) {
+      this.selectedFile = file; // เก็บไฟล์ที่ถูกเลือก
+      console.log('Selected file:', file.name); // ตรวจสอบชื่อไฟล์ใน console
+    } else {
+      console.error('No file selected');
+    }
   }
+  
   onSubmit(): void {
     const formData = new FormData();
     
@@ -60,9 +68,9 @@ export class AdminProductComponent implements OnInit {
   
     // ถ้ามีไฟล์ถูกเลือก
     if (this.selectedFile) {
-      console.log('Uploading file:', this.selectedFile);
-      formData.append('image', this.selectedFile, this.selectedFile.name);
-    }
+      console.log('Uploading file:', this.selectedFile.name); // ตรวจสอบชื่อไฟล์อีกครั้ง
+      formData.append('image', this.selectedFile, this.selectedFile.name); // เก็บชื่อไฟล์พร้อมนามสกุล
+    }    
   
     // ตรวจสอบว่ากำลังอยู่ในโหมดแก้ไขหรือไม่
     if (this.isEditMode && this.selectedProductId) {

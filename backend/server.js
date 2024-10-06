@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const path = require("path");  // เพิ่ม path module สำหรับจัดการเส้นทางของไฟล์
 const checkConnection = require('./utils/db'); // ฟังก์ชันเช็คการเชื่อมต่อฐานข้อมูล
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
@@ -13,7 +14,7 @@ app.use(bodyParser.json());
 app.use(cors({ origin: "http://localhost:4200" }));
 
 // ให้บริการไฟล์ static จากโฟลเดอร์ 'uploads'
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use("/auth", authRoutes);
@@ -23,10 +24,13 @@ app.use("/orders", orderRoutes);  // เปลี่ยนเส้นทาง�
 app.use('/chart', chartRoutes);
 
 // เช็คการเชื่อมต่อกับ SQL Server และเริ่มเซิร์ฟเวอร์
-checkConnection().then(() => {
-    app.listen(3000, () => {
-        console.log("Listening on port 3000...");
+checkConnection()
+    .then(() => {
+        app.listen(3000, () => {
+            console.log("Server is listening on port 3000...");
+        });
+    })
+    .catch(err => {
+        console.error("Unable to start server due to connection failure:", err);
+        process.exit(1);  // หากการเชื่อมต่อล้มเหลว ให้หยุดการทำงานของเซิร์ฟเวอร์
     });
-}).catch(err => {
-    console.error("Unable to start server due to connection failure:", err);
-});

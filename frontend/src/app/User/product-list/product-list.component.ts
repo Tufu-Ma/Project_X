@@ -16,7 +16,7 @@ export class ProductListComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private cartService: CartService,
+
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -60,4 +60,12 @@ export class ProductListComponent implements OnInit {
     this.router.navigate(['/product-detail', productId]);  // นำทางไปยังหน้ารายละเอียดสินค้า
   }
 
+  getImageUrl(imageUrl: string): string {
+    return imageUrl ? `http://localhost:3000${imageUrl}` : 'assets/default.jpg';
+  }
+  
+  onImageError(event: any): void {
+    event.target.src = 'assets/default.jpg';  // ใช้ default.jpg เมื่อภาพไม่สามารถโหลดได้
+  }  
+  
 }

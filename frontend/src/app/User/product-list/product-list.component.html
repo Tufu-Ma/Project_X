@@ -4,7 +4,14 @@
     <div *ngFor="let product of filteredProducts" class="col-lg-2 col-md-3 col-sm-4 mb-4">
       <!-- ใช้ div ครอบการ์ดทั้งหมดแล้วทำเป็น clickable -->
       <div class="card h-100" (click)="goToProductDetail(product.ProductId)" style="cursor: pointer;">
-        <img class="card-img-top" [src]="product.ImageUrl" alt="{{ product.ProductName }}">
+       <img 
+  class="card-img-top" 
+  [src]="getImageUrl(product.ImageUrl)" 
+  alt="{{ product.ProductName }}" 
+  (error)="onImageError($event)"  
+  style="max-height: 150px; object-fit: cover;"  
+/>
+
         <div class="card-body">
           <h5 class="card-title">{{ product.ProductName }}</h5>
           <h6>{{ product.Price | currency }}</h6>
