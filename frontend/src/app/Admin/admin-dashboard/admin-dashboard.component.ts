@@ -50,14 +50,14 @@ export class AdminDashboardComponent implements OnInit {
   
     // ดึงข้อมูลสินค้าที่ขายดีที่สุด
     this.salesService.getBestSellingProducts().subscribe((data: Product[]) => {
-      this.bestSellingProducts = data.sort((a: Product, b: Product) => b.TotalSales - a.TotalSales); // เรียงตามยอดขาย
-      this.bestSellingChartData = this.mapChartData(this.bestSellingProducts, 'TotalSales');  // สร้างข้อมูลสำหรับกราฟสินค้าขายดี
+      this.bestSellingProducts = data.sort((a: Product, b: Product) => b.TotalQuantity - a.TotalQuantity); // เรียงตามจำนวนชิ้นที่ขายได้
+      this.bestSellingChartData = this.mapChartData(this.bestSellingProducts, 'TotalQuantity');  // สร้างข้อมูลสำหรับกราฟสินค้าขายดีตามจำนวนชิ้น
     });
   
     // ดึงข้อมูลสินค้าที่ขายไม่ดี
     this.salesService.getWorstSellingProducts().subscribe((data: Product[]) => {
-      this.worstSellingProducts = data.sort((a: Product, b: Product) => a.TotalSales - b.TotalSales); // เรียงตามยอดขาย
-      this.worstSellingChartData = this.mapChartData(this.worstSellingProducts, 'TotalSales');  // สร้างข้อมูลสำหรับกราฟสินค้าขายไม่ดี
+      this.worstSellingProducts = data.sort((a: Product, b: Product) => a.TotalQuantity - b.TotalQuantity); // เรียงตามจำนวนชิ้นที่ขายได้
+      this.worstSellingChartData = this.mapChartData(this.worstSellingProducts, 'TotalQuantity');  // สร้างข้อมูลสำหรับกราฟสินค้าขายไม่ดีตามจำนวนชิ้น
     });
   }
   
@@ -68,8 +68,8 @@ export class AdminDashboardComponent implements OnInit {
       datasets: [
         {
           data: data.map((item: any) => item[valueField]),
-          label: valueField === 'TotalSales' ? 'Total Sales' : 'Sales Quantity',
-          backgroundColor: valueField === 'TotalSales' ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)',
+          label: valueField === 'TotalQuantity' ? 'Total Quantity Sold' : 'Sales Quantity',
+          backgroundColor: valueField === 'TotalQuantity' ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)',
         }
       ]
     };

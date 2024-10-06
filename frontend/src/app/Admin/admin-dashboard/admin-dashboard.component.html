@@ -1,51 +1,66 @@
 <app-header></app-header>
 
-  <div class="main-content">
-    <section class="stats-overview">
-      <div class="stat-card">
-        <h3>Total Sales</h3>
-        <p>{{ totalSales | currency }}</p> <!-- แสดงยอดขายรวม -->
-      </div>
 
-      <!-- กราฟยอดขายรวม -->
-      <div class="stat-card">
-        <h3>Total Sales Graph</h3>
-        <canvas *ngIf="totalSalesChartData" baseChart
-          [datasets]="totalSalesChartData.datasets"
-          [labels]="totalSalesChartData.labels"
-          [options]="chartOptions"
-          [legend]="chartLegend"
-          [type]="totalSalesChartType"> <!-- กราฟยอดขายรวมเป็นเส้น -->
-        </canvas>
-      </div>
 
-      <div class="stat-card">
-        <h3>Best Selling Products</h3>
-        <canvas *ngIf="bestSellingChartData" baseChart
-          [datasets]="bestSellingChartData.datasets"
-          [labels]="bestSellingChartData.labels"
-          [options]="chartOptions"
-          [legend]="chartLegend"
-          [type]="bestSellingChartType"> <!-- กราฟสินค้าขายดีเป็นแท่ง -->
-        </canvas>
+<div class="container mt-5">
+  <!-- Overview Section -->
+  <section class="row stats-overview">
+    <!-- กราฟยอดขายอยู่ฝั่งซ้าย (ขยายให้เต็มความกว้าง) -->
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm stat-card">
+        <div class="card-body">
+          <h3 class="card-title">Total Sales Graph</h3>
+          <canvas *ngIf="totalSalesChartData" baseChart
+            [datasets]="totalSalesChartData.datasets"
+            [labels]="totalSalesChartData.labels"
+            [options]="chartOptions"
+            [legend]="chartLegend"
+            [type]="totalSalesChartType"
+            style="width: 100%; height: 400px;"> <!-- ขยายขนาดกราฟ -->
+          </canvas>
+        </div>
       </div>
+    </div>
 
-      <div class="stat-card">
-        <h3>Worst Selling Products</h3>
-        <canvas *ngIf="worstSellingChartData" baseChart
-          [datasets]="worstSellingChartData.datasets"
-          [labels]="worstSellingChartData.labels"
-          [options]="chartOptions"
-          [legend]="chartLegend"
-          [type]="worstSellingChartType"> <!-- กราฟสินค้าขายไม่ดีเป็นแท่ง -->
-        </canvas>
+    <!-- รวมกราฟ Best Selling และ Worst Selling Products ในคอลัมน์เดียวกัน -->
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm stat-card">
+        <div class="card-body">
+          <h3 class="card-title">Best & Worst Selling Products</h3>
+          <!-- Best Selling Products (ตามจำนวนชิ้นที่ขาย) -->
+          <canvas *ngIf="bestSellingChartData" baseChart
+            [datasets]="bestSellingChartData.datasets"
+            [labels]="bestSellingChartData.labels"
+            [options]="chartOptions"
+            [legend]="chartLegend"
+            [type]="bestSellingChartType"
+            style="width: 100%; height: 200px;"> <!-- ย่อขนาดกราฟ -->
+          </canvas>
+
+          <!-- Spacer between the charts -->
+          <hr>
+
+          <!-- Worst Selling Products (ตามจำนวนชิ้นที่ขาย) -->
+          <canvas *ngIf="worstSellingChartData" baseChart
+            [datasets]="worstSellingChartData.datasets"
+            [labels]="worstSellingChartData.labels"
+            [options]="chartOptions"
+            [legend]="chartLegend"
+            [type]="worstSellingChartType"
+            style="width: 100%; height: 200px;"> <!-- ย่อขนาดกราฟ -->
+          </canvas>
+        </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ตารางยอดขายรวม -->
-    <h3>Total Sales Table</h3>
-    <table>
-      <thead>
+
+
+  <!-- ตารางยอดขายรวม -->
+  <h3 class="mb-3">Total Sales Table</h3>
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead class="table-dark">
         <tr>
           <th>Date</th>
           <th>Total Sales</th>
@@ -53,16 +68,18 @@
       </thead>
       <tbody>
         <tr *ngFor="let sale of totalSalesData">
-          <td>{{ sale.date }}</td> <!-- วันที่ของยอดขาย -->
-          <td>{{ sale.total | currency }}</td> <!-- ยอดขายรวมในวันนั้น -->
+          <td>{{ sale.date }}</td>
+          <td>{{ sale.total | currency }}</td>
         </tr>
       </tbody>
     </table>
+  </div>
 
-    <!-- ตารางข้อมูลสินค้าขายดี -->
-    <h3>Best Selling Products Table</h3>
-    <table>
-      <thead>
+  <!-- ตารางข้อมูลสินค้าขายดี -->
+  <h3 class="mb-3">Best Selling Products Table</h3>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead class="table-dark">
         <tr>
           <th>Product Name</th>
           <th>Total Quantity Sold</th>
@@ -77,11 +94,13 @@
         </tr>
       </tbody>
     </table>
+  </div>
 
-    <!-- ตารางข้อมูลสินค้าขายไม่ดี -->
-    <h3>Worst Selling Products Table</h3>
-    <table>
-      <thead>
+  <!-- ตารางข้อมูลสินค้าขายไม่ดี -->
+  <h3 class="mb-3">Worst Selling Products Table</h3>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead class="table-dark">
         <tr>
           <th>Product Name</th>
           <th>Total Quantity Sold</th>
@@ -97,4 +116,4 @@
       </tbody>
     </table>
   </div>
-
+</div>
