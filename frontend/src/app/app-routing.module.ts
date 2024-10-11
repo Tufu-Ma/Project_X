@@ -17,6 +17,7 @@ import { OrdersComponent } from './User/orders/orders.component';
 // Admin Components
 import { AdminDashboardComponent } from './Admin/admin-dashboard/admin-dashboard.component';  
 import { AdminProductComponent } from './Admin/admin-product/admin-product.component';
+import { AdminManageComponent } from './Admin/admin-manage/admin-manage.component';
 // Guards
 import { AuthGuard } from './auth.guard';  // นำเข้า Guard สำหรับตรวจสอบสิทธิ์เข้าใช้งาน
 
@@ -41,6 +42,7 @@ const routes: Routes = [
   // เส้นทางผู้ดูแลระบบ (ป้องกันด้วย AuthGuard)
   { path: 'admin', component: AdminDashboardComponent, canActivate: [AuthGuard] },
   { path: 'admin-product', component: AdminProductComponent, canActivate: [AuthGuard] },
+  { path: 'admin-manage',component:AdminManageComponent,canActivate:[AuthGuard]},
   
   // เส้นทางเปลี่ยนเส้นทาง
   { path: '', redirectTo: '/home', pathMatch: 'full' },

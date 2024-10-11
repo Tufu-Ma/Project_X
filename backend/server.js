@@ -1,29 +1,31 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const path = require("path");  // เพิ่ม path module สำหรับจัดการเส้นทางของไฟล์
-const checkConnection = require('./utils/db'); // ฟังก์ชันเช็คการเชื่อมต่อฐานข้อมูล
+const path = require("path");
+const checkConnection = require('./utils/db');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const cartRoutes = require('./routes/cart');
 const orderRoutes = require('./routes/order'); // ระบุ path ที่ถูกต้อง
 const chartRoutes = require('./routes/chart');
-const app = express();
 const categoriesRouter = require('./routes/categories');
+
+
+const app = express();
 
 app.use(bodyParser.json());
 app.use(cors({ origin: "http://localhost:4200" }));
 
-// ให้บริการไฟล์ static จากโฟลเดอร์ 'uploads'
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
 app.use("/cart", cartRoutes);
-app.use("/orders", orderRoutes);  // เปลี่ยนเส้นทางเป็น /orders
+app.use("/orders", orderRoutes);
 app.use('/chart', chartRoutes);
-app.use('/categories', categoriesRouter);  // เพิ่มเส้นทางสำหรับ categories
+app.use('/categories', categoriesRouter);
+
 
 // เช็คการเชื่อมต่อกับ SQL Server และเริ่มเซิร์ฟเวอร์
 checkConnection()

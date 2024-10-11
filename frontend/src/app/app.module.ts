@@ -23,7 +23,7 @@ import { ContactUsComponent } from './Shared/contact-us/contact-us.component';
 
 // Admin Components
 import { AdminDashboardComponent } from './Admin/admin-dashboard/admin-dashboard.component';
-import { AdminOrdersComponent } from './Admin/admin-orders/admin-orders.component';
+import { AdminManageComponent } from './Admin/admin-manage/admin-manage.component';
 import { AdminProductComponent } from './Admin/admin-product/admin-product.component';
 
 // User Components
@@ -48,7 +48,7 @@ const routes: Routes = [
   { path: 'about-us', component: AboutUsComponent },
   { path: 'contact-us', component: ContactUsComponent },
   { path: 'admin-dashboard', component: AdminDashboardComponent },
-  { path: 'admin-orders', component: AdminOrdersComponent },
+  { path: 'admin-manage', component: AdminManageComponent},
   { path: 'admin-products', component: AdminProductComponent },
  
 ];
@@ -71,7 +71,7 @@ const routes: Routes = [
 
     // Admin Components
     AdminDashboardComponent,
-    AdminOrdersComponent,
+    AdminManageComponent,
     AdminProductComponent,
 
     // User Components
