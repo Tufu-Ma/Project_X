@@ -131,5 +131,26 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ message: 'Error deleting order' });
     }
 });
-
+// Route สำหรับกรองสินค้าตามหมวดหมู่ที่ใช้งาน
+router.get('/category/:categoryId', (req, res) => {
+    const categoryId = req.params.categoryId;
+    
+    const query = `
+      SELECT p.* FROM Products p
+      JOIN Categories c ON p.CategoryId = c.CategoryId
+      WHERE p.CategoryId = @CategoryId AND c.Status = 'Active'
+    `;
+    
+    const requestSql = new sql.Request();
+    requestSql.input('CategoryId', sql.Int, categoryId);
+  
+    requestSql.query(query, (err, result) => {
+      if (err) {
+        console.error('Error fetching products by category:', err);
+        return res.status(500).send({ error: 'Internal server error' });
+      }
+      res.send(result.recordset);
+    });
+  });
+  
 module.exports = router;

@@ -9,6 +9,7 @@ const cartRoutes = require('./routes/cart');
 const orderRoutes = require('./routes/order'); // ระบุ path ที่ถูกต้อง
 const chartRoutes = require('./routes/chart');
 const app = express();
+const categoriesRouter = require('./routes/categories');
 
 app.use(bodyParser.json());
 app.use(cors({ origin: "http://localhost:4200" }));
@@ -22,6 +23,7 @@ app.use("/products", productRoutes);
 app.use("/cart", cartRoutes);
 app.use("/orders", orderRoutes);  // เปลี่ยนเส้นทางเป็น /orders
 app.use('/chart', chartRoutes);
+app.use('/categories', categoriesRouter);  // เพิ่มเส้นทางสำหรับ categories
 
 // เช็คการเชื่อมต่อกับ SQL Server และเริ่มเซิร์ฟเวอร์
 checkConnection()

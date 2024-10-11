@@ -17,6 +17,27 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// Route สำหรับการแนะนำสินค้าตามคำค้นหา (วาง route นี้ไว้ก่อน /:id เพื่อป้องกันการชนกัน)
+router.get('/suggestions', (req, res) => {
+  const searchTerm = req.query.search;
+  
+  if (!searchTerm) {
+    return res.status(400).send({ error: 'Search term is required' });
+  }
+
+  const query = `SELECT TOP 5 * FROM Products WHERE ProductName LIKE @SearchTerm`;  // จำกัดการค้นหา 5 รายการ
+  const requestSql = new sql.Request();
+  requestSql.input('SearchTerm', sql.NVarChar, `%${searchTerm}%`);
+
+  requestSql.query(query, (err, result) => {
+    if (err) {
+      console.error('Error fetching product suggestions:', err);
+      return res.status(500).send({ error: 'Internal server error' });
+    }
+    res.send(result.recordset);
+  });
+});
+
 // Route สำหรับเพิ่มสินค้า
 router.post('/', upload.single('image'), (req, res) => {
   console.log('Received product data:', req.body);  
@@ -131,7 +152,7 @@ router.put('/:id', upload.single('image'), (req, res) => {
     return res.status(400).send({ error: 'Missing required fields' });
   }
 
-  // สร้าง query สำหรับแก้ไขสินค้า
+  // กรณีไม่อัปโหลดรูปภาพใหม่ ให้เก็บ URL รูปภาพเดิมไว้
   const query = `
     UPDATE Products
     SET ProductName = @ProductName,
@@ -141,7 +162,7 @@ router.put('/:id', upload.single('image'), (req, res) => {
         Stock = @Stock,
         Brand = @Brand,
         Model = @Model,
-        ImageUrl = @ImageUrl,
+        ImageUrl = ISNULL(@ImageUrl, ImageUrl),  -- เก็บค่าภาพเดิมหากไม่มีการอัปเดต
         UpdatedDate = GETDATE()
     WHERE ProductId = @ProductId
   `;
@@ -170,21 +191,14 @@ router.put('/:id', upload.single('image'), (req, res) => {
   });
 });
 
-// Route สำหรับการแนะนำสินค้าตามคำค้นหา
-router.get('/suggestions', (req, res) => {
-  const searchTerm = req.query.search;
-  
-  if (!searchTerm) {
-    return res.status(400).send({ error: 'Search term is required' });
-  }
-
-  const query = `SELECT TOP 5 * FROM Products WHERE ProductName LIKE @SearchTerm`;  // จำกัดการค้นหา 5 รายการ
+router.get('/category', (req, res) => {
+  const ids = req.query.ids.split(',').map(id => parseInt(id, 10));
+  const query = `SELECT * FROM Products WHERE CategoryId IN (${ids.join(',')})`;
   const requestSql = new sql.Request();
-  requestSql.input('SearchTerm', sql.NVarChar, `%${searchTerm}%`);
-
+  
   requestSql.query(query, (err, result) => {
     if (err) {
-      console.error('Error fetching product suggestions:', err);
+      console.error('Error fetching products by categories:', err);
       return res.status(500).send({ error: 'Internal server error' });
     }
     res.send(result.recordset);

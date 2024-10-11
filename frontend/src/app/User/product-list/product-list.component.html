@@ -1,21 +1,100 @@
 <app-header></app-header>
 <div class="container">
   <div class="row">
-    <div *ngFor="let product of filteredProducts" class="col-lg-2 col-md-3 col-sm-4 mb-4">
-      <!-- ใช้ div ครอบการ์ดทั้งหมดแล้วทำเป็น clickable -->
-      <div class="card h-100" (click)="goToProductDetail(product.ProductId)" style="cursor: pointer;">
-       <img 
-  class="card-img-top" 
-  [src]="getImageUrl(product.ImageUrl)" 
-  alt="{{ product.ProductName }}" 
-  (error)="onImageError($event)"  
-  style="max-height: 150px; object-fit: cover;"  
-/>
-
+    <!-- Input สำหรับค้นหาสินค้า -->
+    <div class="col-12 mb-3">
+      <input 
+        type="text" 
+        class="form-control" 
+        placeholder="Search products..." 
+        [(ngModel)]="searchTerm" 
+        (input)="filterProducts()" 
+      />
+    </div>
+  </div>
+  <div class="row">
+    <!-- Checkbox สำหรับกรองหมวดหมู่ในคอลัมน์แยก -->
+    <div class="col-lg-2 col-md-3 col-sm-12 mb-3">
+      <div class="card">
         <div class="card-body">
-          <h5 class="card-title">{{ product.ProductName }}</h5>
-          <h6>{{ product.Price | currency }}</h6>
-          <p class="card-text">{{ product.Description }}</p>
+          <label class="form-label">Filter by Category:</label>
+          <div *ngFor="let category of categories">
+            <div class="form-check">
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                [value]="category.CategoryId" 
+                (change)="onCategoryChange($event)" 
+                id="category-{{category.CategoryId}}"
+              />
+              <label class="form-check-label" for="category-{{category.CategoryId}}">
+                {{ category.CategoryName }}
+              </label>
+            </div>
+          </div>
+
+          <!-- Checkbox สำหรับหมวดหมู่ 'Other' -->
+<div class="form-check">
+  <input 
+    class="form-check-input" 
+    type="checkbox" 
+    (change)="onCategoryChange($event)" 
+    id="category-other" /> <!-- ใช้ id เพื่อตรวจสอบในฟังก์ชัน -->
+    
+  <label class="form-check-label" for="category-other">
+    Other
+  </label>
+</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- แสดงสินค้าทางขวามือ -->
+    <div class="col-lg-10 col-md-9 col-sm-12">
+      <div class="row" *ngFor="let category of groupedProducts | keyvalue">
+        <ng-container *ngIf="category.key !== 'Other'">
+          <div class="col-12">
+            <h3>{{ category.key }}</h3> <!-- ชื่อหมวดหมู่ -->
+          </div>
+          <div class="d-flex flex-wrap">
+            <div *ngFor="let product of category.value" class="col-lg-2 col-md-4 col-sm-6 mb-4">
+              <div class="card h-100" (click)="goToProductDetail(product.ProductId)" style="cursor: pointer;">
+                <img 
+                  class="card-img-top" 
+                  [src]="getImageUrl(product.ImageUrl)" 
+                  alt="{{ product.ProductName }}" 
+                  (error)="onImageError($event)"  
+                />
+                <div class="card-body">
+                  <h5 class="card-title">{{ product.ProductName }}</h5>
+                  <h6>{{ product.Price | currency }}</h6> <!-- แสดงราคาสินค้า -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- แสดงสินค้าที่ไม่มีหมวดหมู่ในหมวดหมู่ 'Other' -->
+      <div class="row" *ngIf="groupedProducts['Other'] && groupedProducts['Other'].length > 0">
+        <div class="col-12">
+          <h3>Other</h3>
+        </div>
+        <div class="d-flex flex-wrap">
+          <div *ngFor="let product of groupedProducts['Other']" class="col-lg-2 col-md-4 col-sm-6 mb-4">
+            <div class="card h-100" (click)="goToProductDetail(product.ProductId)" style="cursor: pointer;">
+              <img 
+                class="card-img-top" 
+                [src]="getImageUrl(product.ImageUrl)" 
+                alt="{{ product.ProductName }}" 
+                (error)="onImageError($event)"  
+              />
+              <div class="card-body">
+                <h5 class="card-title">{{ product.ProductName }}</h5>
+                <h6>{{ product.Price | currency }}</h6> <!-- แสดงราคาสินค้า -->
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

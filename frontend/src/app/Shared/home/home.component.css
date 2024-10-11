@@ -1,16 +1,16 @@
 .card-container {
   justify-content: center;
   display: flex;
-  flex-wrap: nowrap; /* การ์ดเรียงในแนวนอน */
-  overflow-x: auto; /* เลื่อนแนวนอนได้ถ้าจำเป็น */
-  gap: 10px; /* ช่องว่างระหว่างการ์ด */
-  padding: 10px; /* Padding รอบๆ คอนเทนเนอร์ */
+  flex-wrap: nowrap; /* การ์ดเรียงในแนวนอน /
+  overflow-x: auto; / เลื่อนแนวนอนได้ถ้าจำเป็น /
+  gap: 10px; / ช่องว่างระหว่างการ์ด /
+  padding: 10px; / Padding รอบๆ คอนเทนเนอร์ /
 }
 
 .card {
   display: flex;
   flex-direction: column;
-  max-width: 200px; /* กำหนดความกว้างสูงสุดของการ์ด */
+  max-width: 200px; / กำหนดความกว้างสูงสุดของการ์ด /
   text-align: center;
   background-color: #ffffff;
   border-radius: 8px;
@@ -19,10 +19,10 @@
 }
 
 .card-img-top {
-  width: 100%; /* ให้รูปภาพขยายเต็มความกว้างของการ์ด */
-  height: auto; /* ให้ความสูงของรูปภาพปรับอัตโนมัติตามสัดส่วน */
-  max-height: 150px; /* จำกัดความสูงสูงสุดของรูปภาพเป็น 150px */
-  object-fit: cover; /* ให้รูปภาพครอบคลุมพื้นที่ที่กำหนดไว้ โดยรักษาสัดส่วนของภาพ */
+  width: 100%; / ให้รูปภาพขยายเต็มความกว้างของการ์ด /
+  height: auto; / ให้ความสูงของรูปภาพปรับอัตโนมัติตามสัดส่วน /
+  max-height: 150px; / จำกัดความสูงสูงสุดของรูปภาพเป็น 150px /
+  object-fit: cover; / ให้รูปภาพครอบคลุมพื้นที่ที่กำหนดไว้ โดยรักษาสัดส่วนของภาพ /
 }
 
 .card-body {
@@ -31,7 +31,7 @@
 footer .col p,
 footer .col h5,
 footer .col ul li a {
-    font-size: 0.875rem; /* Adjust this value as needed */
+    font-size: 0.875rem; / Adjust this value as needed */
 }
 html, body {
   height: 100%;

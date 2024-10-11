@@ -1,21 +1,49 @@
 <app-header></app-header>
+<style>
+  .carousel-item img {
+    width: 100%;
+    height: 500px; /* Set a fixed height */
+    object-fit: cover; /* Ensures the image covers the entire area without distortion */
+  }
+</style>
+<div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="https://res.cloudinary.com/itcity-production/image/upload/f_auto,q_auto/v1648794228/page-landing/hqn1b58gl5acybps0gri.jpg" class="d-block w-100" alt="...">
+    </div>
+    <div class="carousel-item">
+      <img src="https://res.cloudinary.com/itcity-production/image/upload/f_png,q_80/v1680669205/page-landing/content/c5t8smndznkipyxts0rq.png" class="d-block w-100" alt="...">
+    </div>
+    
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+  
 <div class="container mt-5">
   <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
     <div class="col">
       <div class="card">
         <img src="https://mercular.s3.ap-southeast-1.amazonaws.com/images/products/2023/06/Product/hyperx-cloud-iii-gaming-headset-black-red-front-left-view.jpg" class="card-img-top" alt="หูฟัง" [routerLink]="['/product-list']">
         <div class="card-body">
-          <h5 class="card-title">หูฟัง</h5>
+          <h5 class="card-title">Headset</h5>
           <p class="card-text"></p>
         </div>
       </div>
     </div>
-
+   
     <div class="col">
       <div class="card">
         <img src="https://mercular.s3.ap-southeast-1.amazonaws.com/images/products/2024/03/Product/nubwo-nk44-keyboard-black-gray-front-left-view.jpg" class="card-img-top" alt="คีย์บอร์ด" [routerLink]="['/product-list']">
         <div class="card-body">
-          <h5 class="card-title">คีย์บอร์ด</h5>
+          <h5 class="card-title">Keyboard</h5>
           <p class="card-text"></p>
         </div>
       </div>
@@ -25,7 +53,7 @@
       <div class="card">
         <img src="https://mercular.s3.ap-southeast-1.amazonaws.com/images/products/2023/08/Product/logitech-g-pro-x-superlight-2-wireless-gaming-mouse-white-front-left-view.jpg" class="card-img-top" alt="เมาท์" [routerLink]="['/product-list']">
         <div class="card-body">
-          <h5 class="card-title">เมาท์</h5>
+          <h5 class="card-title">Mouse</h5>
         </div>
       </div>
     </div>
@@ -34,7 +62,7 @@
       <div class="card">
         <img src="https://mercular.s3.ap-southeast-1.amazonaws.com/images/products/2023/09/Product/edifier-r19bt-computer-speaker-front-view.jpg" class="card-img-top" alt="ลำโพง" [routerLink]="['/product-list']">
         <div class="card-body">
-          <h5 class="card-title">ลำโพง</h5>
+          <h5 class="card-title">Speaker</h5>
         </div>
       </div>
     </div>
@@ -43,7 +71,7 @@
       <div class="card">
         <img src="https://mercular.s3.ap-southeast-1.amazonaws.com/images/products/2021/03/microsoft-xbox-controller-wired.jpg" class="card-img-top" alt="จอย" [routerLink]="['/product-list']">
         <div class="card-body">
-          <h5 class="card-title">จอย</h5>
+          <h5 class="card-title">Controller</h5>
         </div>
       </div>
     </div>
@@ -90,10 +118,5 @@
         </li>
       </ul>
       
-  
-        </div>
-      </div>
-    </div>
  <div class="d-flex gap-2 justify-content-center py-5">
 </div>
-

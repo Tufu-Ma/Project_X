@@ -4,39 +4,46 @@ import { ProductService } from '../../services/product.service'; // นำเข
 import { AuthService } from '../../auth.service';  // ใช้ AuthService สำหรับตรวจสอบการล็อกอิน
 import { HeaderService } from '../../services/header.service';
 
-
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-  searchTerm: string = '';  // เพิ่มตัวแปร searchTerm
-  suggestions: any[] = [];  // เพิ่มตัวแปร suggestions
+  searchTerm: string = '';  // ตัวแปรสำหรับคำค้นหา
+  suggestions: any[] = [];  // ตัวแปรสำหรับเก็บคำแนะนำ
   isAdmin: boolean = false;
 
-  // Inject ProductService, Router และ ChangeDetectorRef เข้ามาใน constructor
   constructor(
     public authService: AuthService,
     private router: Router,
     private productService: ProductService,
     private headerService: HeaderService,
-    private cd: ChangeDetectorRef // เพิ่ม ChangeDetectorRef เพื่อบังคับการตรวจสอบ
+    private cd: ChangeDetectorRef // ใช้สำหรับบังคับการตรวจสอบ
   ) {}
 
   ngOnInit() {
-    // ตรวจสอบบทบาทของผู้ใช้จาก AuthService
     const userRole = this.authService.getUserRole();
-    this.isAdmin = userRole === 'Admin'; // เปลี่ยนเป็น true ถ้าเป็น Admin
-    
-    // เช็คจาก HeaderService ถ้าใช้
+    this.isAdmin = userRole === 'Admin'; // ตรวจสอบว่าผู้ใช้เป็น Admin หรือไม่
+
     this.headerService.isAdmin$.subscribe(isAdmin => {
       this.isAdmin = isAdmin;
-      this.cd.detectChanges(); // บังคับให้ Angular ตรวจสอบการเปลี่ยนแปลง
+      this.cd.detectChanges(); // ตรวจสอบการเปลี่ยนแปลง
     });
   }
 
-  // ฟังก์ชัน onSearchInput ที่ทำงานเมื่อผู้ใช้พิมพ์ในแถบค้นหา
+  // ฟังก์ชันสำหรับการค้นหาเมื่อกดปุ่มค้นหา
+  onSearch(): void {
+    if (this.searchTerm) {
+      this.router.navigate(['/product-list'], { queryParams: { search: this.searchTerm } });
+      this.suggestions = []; // เคลียร์คำแนะนำ
+    } else {
+      // หากไม่มีคำค้นหาให้แสดงสินค้าทั้งหมด
+      this.router.navigate(['/product-list']);
+    }
+  }
+
+  // ฟังก์ชันสำหรับการค้นหาแบบเรียลไทม์
   onSearchInput(): void {
     if (this.searchTerm.length > 2) {
       this.productService.getProductSuggestions(this.searchTerm).subscribe(
@@ -52,24 +59,16 @@ export class HeaderComponent {
     }
   }
 
-  // ฟังก์ชัน onSearch สำหรับการทำงานเมื่อผู้ใช้กดค้นหา
-  onSearch(): void {
-    if (this.searchTerm) {
-      this.router.navigate(['/product-list'], { queryParams: { search: this.searchTerm } });
-      this.suggestions = [];
-    }
-  }
-
-  // ฟังก์ชัน selectSuggestion สำหรับเลือกสินค้าจากรายการแนะนำ
+  // ฟังก์ชันสำหรับเลือกคำแนะนำ
   selectSuggestion(suggestion: any): void {
     this.searchTerm = suggestion.ProductName;
-    this.onSearch();
+    this.onSearch(); // ทำการค้นหาหลังจากเลือกคำแนะนำ
   }
 
-  // ฟังก์ชัน logout สำหรับการล็อกเอาต์
+  // ฟังก์ชันสำหรับการล็อกเอาต์
   logout(): void {
     this.authService.logout();  // ล้างข้อมูลการล็อกอิน
     this.headerService.setAdminStatus(false); // รีเซ็ตสถานะผู้ดูแลระบบ
     this.router.navigate(['/login']);  // นำผู้ใช้กลับไปที่หน้า login
-  }  
+  }
 }

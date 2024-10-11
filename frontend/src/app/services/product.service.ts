@@ -6,9 +6,9 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ProductService {
-  private apiUrl = 'http://localhost:3000/products';
   
-
+  private apiUrl = 'http://localhost:3000/products';
+  private categoriesUrl = 'http://localhost:3000/categories';
 
   constructor(private http: HttpClient) { }
 
@@ -21,7 +21,6 @@ export class ProductService {
   getProductById(productId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${productId}`);
   }
-
 
   // เพิ่มสินค้า
   addProduct(formData: FormData): Observable<any> {
@@ -38,10 +37,20 @@ export class ProductService {
     return this.http.delete(`${this.apiUrl}/${productId}`);
   }
 
-
   // ฟังก์ชันสำหรับดึงรายการสินค้าตามคำที่กำลังพิมพ์
   getProductSuggestions(searchTerm: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/suggestions?search=${searchTerm}`);
   }
-}
 
+  // ฟังก์ชันสำหรับดึงหมวดหมู่ทั้งหมด
+  getCategories(): Observable<any[]> {
+    return this.http.get<any[]>(this.categoriesUrl);  // URL สำหรับดึงหมวดหมู่
+  }
+
+  /// ฟังก์ชันสำหรับดึงสินค้าตามหมวดหมู่
+getProductsByCategory(categoryIds: number[]): Observable<any[]> {
+  // สร้าง query string สำหรับ ID ที่ส่งเป็น array
+  const ids = categoryIds.join(',');
+  return this.http.get<any[]>(`${this.apiUrl}/category?ids=${ids}`);
+}
+}
