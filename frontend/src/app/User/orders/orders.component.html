@@ -6,7 +6,7 @@
       <thead>
         <tr>
           <th>Order ID</th>
-          <th>User ID</th>
+          <th>Quantity</th>
           <th>Total Amount</th>
           <th>Order Status</th>
           <th>Actions</th>
@@ -15,7 +15,7 @@
       <tbody>
         <tr *ngFor="let order of orders">
           <td>{{ order.OrderId }}</td>
-          <td>{{ order.UserId }}</td>
+          <td>{{ order.Quantity }}</td>
           <td>{{ order.TotalAmount | currency }}</td>
           <td>{{ order.OrderStatus }}</td>
           <td>
@@ -29,7 +29,8 @@
     <!-- แสดงรายละเอียดคำสั่งซื้อ -->
     <div *ngIf="selectedOrder" class="order-details">
       <h3>Order Details (ID: {{ selectedOrder.OrderId }})</h3>
-      <p><strong>User ID:</strong> {{ selectedOrder.UserId }}</p>
+      <p><strong>Customer:</strong> {{ selectedOrder.Name }}</p>
+      <p><strong>Quantity:</strong> {{ selectedOrder.Quantity }}</p>
       <p><strong>Total Amount:</strong> {{ selectedOrder.TotalAmount | currency }}</p>
       <p><strong>Status:</strong> {{ selectedOrder.OrderStatus }}</p>
       <p><strong>Order Date:</strong> {{ selectedOrder.OrderDate | date }}</p>

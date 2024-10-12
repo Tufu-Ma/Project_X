@@ -32,12 +32,11 @@
 
       <ng-container *ngIf="authService.isLoggedIn(); else notLoggedIn">
         <div class="dropdown">
-          <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="assets/profile-icon.png" alt="Profile" width="30" height="30">
+          <a class="btn btn-secondary dropdown-toggle profile-btn" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="assets/Profile.png" alt="Profile" width="30" height="30" class="rounded-circle">
           </a>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
             <li><a class="dropdown-item" routerLink="/orders">ประวัติการซื้อ</a></li>
-            <li><a class="dropdown-item" routerLink="/payment-history">ประวัติการจ่ายเงิน</a></li>
             <li><a class="dropdown-item" (click)="logout()">ล็อกเอาต์</a></li>
           </ul>
         </div>
@@ -91,12 +90,11 @@
         </a>
         <ng-container *ngIf="authService.isLoggedIn(); else notLoggedIn">
           <div class="dropdown ms-2">
-            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="assets/profile-icon.png" alt="Profile" width="30" height="30">
+            <a class="btn btn-secondary dropdown-toggle profile-btn" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="assets/Profile.png" alt="Profile" width="30" height="30" class="rounded-circle">
             </a>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
               <li><a class="dropdown-item" routerLink="/orders">ประวัติการซื้อ</a></li>
-              <li><a class="dropdown-item" routerLink="/payment-history">ประวัติการจ่ายเงิน</a></li>
               <li><a class="dropdown-item" (click)="logout()">ล็อกเอาต์</a></li>
             </ul>
           </div>

@@ -64,7 +64,12 @@ router.get('/:userId', async (req, res) => {
       const pool = await checkConnection();
       const result = await pool.request()
         .input('UserId', sql.Int, userId)
-        .query('SELECT CartId, ProductId, ProductName, Quantity, Price FROM Cart WHERE UserId = @UserId'); // เพิ่ม CartId
+        .query(`
+          SELECT CartId, c.ProductId, p.ProductName, c.Quantity, p.Price, p.ImageUrl 
+          FROM Cart c
+          JOIN Products p ON c.ProductId = p.ProductId
+          WHERE c.UserId = @UserId
+        `); // เพิ่มการดึง ImageUrl จากตาราง Products
   
       if (result.recordset.length === 0) {
         return res.status(404).send({ message: 'No items in cart for this user' });
@@ -75,7 +80,8 @@ router.get('/:userId', async (req, res) => {
       console.error('Error fetching cart items:', err);
       res.status(500).send({ error: 'Internal server error' });
     }
-  });
+});
+
   
 
 
@@ -152,39 +158,77 @@ router.post('/checkout', async (req, res) => {
         await transaction.begin();
 
         try {
-            // เริ่มต้นสร้างคำสั่งซื้อในตาราง Orders
-            let totalAmount = 0;
+            // ดึงข้อมูลชื่อผู้ใช้จากตาราง Users
+            const userResult = await transaction.request()
+                .input('UserId', sql.Int, userId)
+                .query('SELECT Name FROM Users WHERE UserId = @UserId');
 
+            const userName = userResult.recordset[0].Name;
+
+            if (!userName) {
+                await transaction.rollback();
+                return res.status(400).json({ error: "Invalid user" });
+            }
+
+            // เริ่มต้นสร้างคำสั่งซื้อในตาราง Orders และเก็บข้อมูล Name, ProductName, Quantity และ ImageUrl ของสินค้าชิ้นแรกในตาราง Orders
+            let totalAmount = 0;
+            const firstItem = items[0];  // สมมติว่าสินค้าชิ้นแรกจะถูกเก็บใน Orders
+            const { productId, quantity } = firstItem;
+
+            if (!productId || quantity <= 0) {
+                await transaction.rollback();
+                return res.status(400).json({ error: "Invalid product or quantity" });
+            }
+
+            // ดึงข้อมูลสินค้า (ProductName, Price และ ImageUrl) จากตาราง Products
+            const productResult = await transaction.request()
+                .input('ProductId', sql.Int, productId)
+                .query('SELECT ProductName, Price, ImageUrl FROM Products WHERE ProductId = @ProductId');
+
+            const productName = productResult.recordset[0].ProductName;
+            const unitPrice = productResult.recordset[0].Price;
+            const imageUrl = productResult.recordset[0].ImageUrl;
+            const totalPrice = unitPrice * quantity;
+
+            // เพิ่มคำสั่งซื้อในตาราง Orders พร้อมเก็บข้อมูล Name, ProductName, Quantity และ ImageUrl ของสินค้าชิ้นแรก
             const orderResult = await transaction.request()
                 .input('UserId', sql.Int, userId)
-                .query('INSERT INTO Orders (UserId, OrderDate, TotalAmount) OUTPUT INSERTED.OrderId VALUES (@UserId, GETDATE(), 0)');
+                .input('Name', sql.NVarChar(255), userName)
+                .input('ProductName', sql.NVarChar(255), productName)
+                .input('Quantity', sql.Int, quantity)
+                .input('ImageUrl', sql.NVarChar(255), imageUrl)  // เก็บ ImageUrl ลงในตาราง Orders
+                .input('TotalAmount', sql.Decimal(10, 2), totalPrice)
+                .query('INSERT INTO Orders (UserId, Name, OrderDate, ProductName, Quantity, ImageUrl, TotalAmount) OUTPUT INSERTED.OrderId VALUES (@UserId, @Name, GETDATE(), @ProductName, @Quantity, @ImageUrl, @TotalAmount)');
 
             const orderId = orderResult.recordset[0].OrderId;
 
+            // หากมีสินค้ามากกว่า 1 ชิ้น สามารถบันทึกลงใน OrderItems (บันทึกทุกชิ้นที่สั่งซื้อ)
             for (const item of items) {
                 const { productId, quantity } = item;
 
-                // ตรวจสอบข้อมูลก่อนที่จะเพิ่มลง OrderItems
                 if (!productId || quantity <= 0) {
                     await transaction.rollback();
                     return res.status(400).json({ error: "Invalid product or quantity" });
                 }
 
-                // ดึงราคาต่อหน่วย (UnitPrice) ของสินค้าจากฐานข้อมูล
+                // ดึงข้อมูลสินค้าเพิ่มเติม
                 const productResult = await transaction.request()
                     .input('ProductId', sql.Int, productId)
-                    .query('SELECT Price FROM Products WHERE ProductId = @ProductId');
+                    .query('SELECT ProductName, Price, ImageUrl FROM Products WHERE ProductId = @ProductId');
 
+                const productName = productResult.recordset[0].ProductName;
                 const unitPrice = productResult.recordset[0].Price;
+                const imageUrl = productResult.recordset[0].ImageUrl;
                 const totalPrice = unitPrice * quantity;
 
-                // เพิ่มสินค้าลงในตาราง OrderItems พร้อมกับ UnitPrice
+                // เพิ่มสินค้าลงในตาราง OrderItems พร้อมกับ UnitPrice, ProductName และ ImageUrl
                 await transaction.request()
                     .input('OrderId', sql.Int, orderId)
                     .input('ProductId', sql.Int, productId)
                     .input('Quantity', sql.Int, quantity)
                     .input('Price', sql.Decimal(10, 2), unitPrice)
-                    .query('INSERT INTO OrderItems (OrderId, ProductId, Quantity, Price) VALUES (@OrderId, @ProductId, @Quantity, @Price)');
+                    .input('ImageUrl', sql.NVarChar(255), imageUrl)  // เก็บ ImageUrl ลงใน OrderItems
+                    .query('INSERT INTO OrderItems (OrderId, ProductId, Quantity, Price, ImageUrl) VALUES (@OrderId, @ProductId, @Quantity, @Price, @ImageUrl)');
 
                 // สะสม TotalAmount (ยอดรวมทั้งหมด)
                 totalAmount += totalPrice;

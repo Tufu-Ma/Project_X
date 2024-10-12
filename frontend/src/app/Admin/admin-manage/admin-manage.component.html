@@ -1,36 +1,38 @@
 <app-header></app-header>
 <div class="admin-manage-container">
-    <h2>Manage Orders</h2>
-  
-    <table class="orders-table">
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Customer</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let order of orders">
-            <td>{{ order.orderId }}</td>  <!-- ตรวจสอบว่า orderId ถูกต้อง -->
-            <td>{{ order.customerName }}</td>
-            <td>{{ order.status }}</td>
-            <td>
-              <!-- Dropdown สำหรับเลือกสถานะใหม่ -->
-              <select [(ngModel)]="order.newStatus">
-                <option value="Pending">Pending</option>
-                <option value="Shipped">Shipped</option>
-                <option value="Delivered">Delivered</option>
-                <option value="Cancelled">Cancelled</option>
-              </select>
-              <button class="update-btn" (click)="updateOrderStatus(order.orderId, order.newStatus)">
-                Update Status
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      
-  </div>
-  
+  <h2>Manage Orders</h2>
+
+  <table class="orders-table">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Customer</th>
+        <th>Quantity</th>
+        <th>Total Amount</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let order of orders">
+        <td>{{ order.OrderId }}</td>
+        <td>{{ order.customerName }}</td>
+        <td>{{ order.quantity }}</td>
+        <td>{{ order.TotalAmount }}</td>
+        <td>{{ order.OrderStatus }}</td>
+        <td>
+          <!-- Dropdown สำหรับเลือกสถานะใหม่ -->
+          <select [(ngModel)]="order.newStatus">
+            <option value="Pending">Pending</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <button class="update-btn" (click)="updateOrderStatus(order.OrderId, order.newStatus)">
+            Update Status
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
