@@ -10,7 +10,6 @@ const orderRoutes = require('./routes/order'); // ระบุ path ที่ถ
 const chartRoutes = require('./routes/chart');
 const categoriesRouter = require('./routes/categories');
 
-
 const app = express();
 
 app.use(bodyParser.json());

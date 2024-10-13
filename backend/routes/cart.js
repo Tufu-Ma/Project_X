@@ -5,11 +5,10 @@ const router = express.Router();
 
 // เพิ่มสินค้าลงในรถเข็น
 router.post('/add', async (req, res) => {
-    const { userId, productId, productName, price, imageUrl, quantity } = req.body; // เอา description และ brand ออก
+    const { userId, productId, productName, price, imageUrl, quantity } = req.body;
 
-    // ตรวจสอบและกำหนดค่า default ให้ productName และ imageUrl ถ้าค่าเป็น null หรือ undefined
-    const validProductName = productName || 'Unnamed Product'; // ตั้งค่า default ถ้าไม่มี productName
-    const validImageUrl = imageUrl || ''; // ตั้งค่า default ถ้าไม่มี imageUrl
+    const validProductName = productName || 'Unnamed Product';
+    const validImageUrl = imageUrl || '';
 
     if (!userId || !productId || !quantity) {
         console.log('Invalid input:', { userId, productId, quantity, productName });
@@ -18,8 +17,19 @@ router.post('/add', async (req, res) => {
 
     try {
         const pool = await checkConnection();
-        console.log('Connection Successful!');
 
+        // ดึงข้อมูล stock ของสินค้า
+        const stockResult = await pool.request()
+            .input('productId', sql.Int, productId)
+            .query('SELECT Stock FROM Products WHERE ProductId = @productId');
+
+        const productStock = stockResult.recordset[0].Stock;
+
+        if (!productStock || quantity > productStock) {
+            return res.status(400).json({ error: 'Quantity exceeds available stock' });
+        }
+
+        // ตรวจสอบว่ามีสินค้าอยู่ในรถเข็นหรือยัง
         const checkCart = await pool.request()
             .input('userId', sql.Int, userId)
             .input('productId', sql.Int, productId)
@@ -27,8 +37,14 @@ router.post('/add', async (req, res) => {
 
         if (checkCart.recordset.length > 0) {
             const currentQuantity = checkCart.recordset[0].Quantity;
+            const newQuantity = currentQuantity + quantity;
+
+            if (newQuantity > productStock) {
+                return res.status(400).json({ error: 'Quantity exceeds available stock' });
+            }
+
             await pool.request()
-                .input('quantity', sql.Int, currentQuantity + quantity)
+                .input('quantity', sql.Int, newQuantity)
                 .input('userId', sql.Int, userId)
                 .input('productId', sql.Int, productId)
                 .query('UPDATE Cart SET Quantity = @quantity WHERE UserId = @userId AND ProductId = @productId');
@@ -37,9 +53,9 @@ router.post('/add', async (req, res) => {
             await pool.request()
                 .input('userId', sql.Int, userId)
                 .input('productId', sql.Int, productId)
-                .input('productName', sql.NVarChar, validProductName) // ใช้ค่า validProductName
+                .input('productName', sql.NVarChar, validProductName)
                 .input('price', sql.Decimal, price)
-                .input('imageUrl', sql.NVarChar, validImageUrl) // ใช้ค่า validImageUrl
+                .input('imageUrl', sql.NVarChar, validImageUrl)
                 .input('quantity', sql.Int, quantity)
                 .query('INSERT INTO Cart (UserId, ProductId, ProductName, Price, ImageUrl, Quantity) VALUES (@userId, @productId, @productName, @price, @imageUrl, @quantity)');
             res.status(200).json({ message: 'Product added to cart' });
@@ -49,6 +65,7 @@ router.post('/add', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 
 
 
@@ -170,71 +187,81 @@ router.post('/checkout', async (req, res) => {
                 return res.status(400).json({ error: "Invalid user" });
             }
 
-            // เริ่มต้นสร้างคำสั่งซื้อในตาราง Orders และเก็บข้อมูล Name, ProductName, Quantity และ ImageUrl ของสินค้าชิ้นแรกในตาราง Orders
+            // เริ่มต้นสร้างคำสั่งซื้อในตาราง Orders
             let totalAmount = 0;
-            const firstItem = items[0];  // สมมติว่าสินค้าชิ้นแรกจะถูกเก็บใน Orders
-            const { productId, quantity } = firstItem;
 
-            if (!productId || quantity <= 0) {
-                await transaction.rollback();
-                return res.status(400).json({ error: "Invalid product or quantity" });
-            }
-
-            // ดึงข้อมูลสินค้า (ProductName, Price และ ImageUrl) จากตาราง Products
-            const productResult = await transaction.request()
-                .input('ProductId', sql.Int, productId)
-                .query('SELECT ProductName, Price, ImageUrl FROM Products WHERE ProductId = @ProductId');
-
-            const productName = productResult.recordset[0].ProductName;
-            const unitPrice = productResult.recordset[0].Price;
-            const imageUrl = productResult.recordset[0].ImageUrl;
-            const totalPrice = unitPrice * quantity;
-
-            // เพิ่มคำสั่งซื้อในตาราง Orders พร้อมเก็บข้อมูล Name, ProductName, Quantity และ ImageUrl ของสินค้าชิ้นแรก
-            const orderResult = await transaction.request()
-                .input('UserId', sql.Int, userId)
-                .input('Name', sql.NVarChar(255), userName)
-                .input('ProductName', sql.NVarChar(255), productName)
-                .input('Quantity', sql.Int, quantity)
-                .input('ImageUrl', sql.NVarChar(255), imageUrl)  // เก็บ ImageUrl ลงในตาราง Orders
-                .input('TotalAmount', sql.Decimal(10, 2), totalPrice)
-                .query('INSERT INTO Orders (UserId, Name, OrderDate, ProductName, Quantity, ImageUrl, TotalAmount) OUTPUT INSERTED.OrderId VALUES (@UserId, @Name, GETDATE(), @ProductName, @Quantity, @ImageUrl, @TotalAmount)');
-
-            const orderId = orderResult.recordset[0].OrderId;
-
-            // หากมีสินค้ามากกว่า 1 ชิ้น สามารถบันทึกลงใน OrderItems (บันทึกทุกชิ้นที่สั่งซื้อ)
+            // ตรวจสอบ stock ก่อนทำการสั่งซื้อทุกชิ้น
             for (const item of items) {
                 const { productId, quantity } = item;
 
-                if (!productId || quantity <= 0) {
-                    await transaction.rollback();
-                    return res.status(400).json({ error: "Invalid product or quantity" });
-                }
+                // ตรวจสอบว่ามีสินค้าที่เลือกอยู่หรือไม่ และ stock เพียงพอหรือไม่
+                const stockResult = await transaction.request()
+                    .input('ProductId', sql.Int, productId)
+                    .query('SELECT Stock, ProductName, Price, ImageUrl FROM Products WHERE ProductId = @ProductId');
 
-                // ดึงข้อมูลสินค้าเพิ่มเติม
+                const product = stockResult.recordset[0];
+
+                if (!product || product.Stock < quantity) {
+                    await transaction.rollback();
+                    return res.status(400).json({ error: `Insufficient stock for ${product.ProductName}` });
+                }
+            }
+
+            // ถ้า stock เพียงพอ ทำการเพิ่มคำสั่งซื้อในตาราง Orders
+            const firstItem = items[0];
+            const firstProductResult = await transaction.request()
+                .input('ProductId', sql.Int, firstItem.productId)
+                .query('SELECT ProductName, Price, ImageUrl FROM Products WHERE ProductId = @ProductId');
+
+            const firstProduct = firstProductResult.recordset[0];
+            const firstTotalPrice = firstProduct.Price * firstItem.quantity;
+
+            const orderResult = await transaction.request()
+                .input('UserId', sql.Int, userId)
+                .input('Name', sql.NVarChar(255), userName)
+                .input('ProductName', sql.NVarChar(255), firstProduct.ProductName)
+                .input('Quantity', sql.Int, firstItem.quantity)
+                .input('ImageUrl', sql.NVarChar(255), firstProduct.ImageUrl)
+                .input('TotalAmount', sql.Decimal(10, 2), firstTotalPrice)
+                .input('ProductId', sql.Int, firstItem.productId) // เพิ่ม ProductId
+                .query(`INSERT INTO Orders (UserId, Name, OrderDate, ProductName, Quantity, ImageUrl, TotalAmount, ProductId) 
+                        OUTPUT INSERTED.OrderId 
+                        VALUES (@UserId, @Name, GETDATE(), @ProductName, @Quantity, @ImageUrl, @TotalAmount, @ProductId)`); // เพิ่ม ProductId ที่นี่
+
+            const orderId = orderResult.recordset[0].OrderId;
+
+            // ถ้ามีสินค้ามากกว่า 1 ชิ้น ทำการเพิ่มข้อมูลลงในตาราง OrderItems
+            for (const item of items) {
+                const { productId, quantity } = item;
+
                 const productResult = await transaction.request()
                     .input('ProductId', sql.Int, productId)
                     .query('SELECT ProductName, Price, ImageUrl FROM Products WHERE ProductId = @ProductId');
 
-                const productName = productResult.recordset[0].ProductName;
-                const unitPrice = productResult.recordset[0].Price;
-                const imageUrl = productResult.recordset[0].ImageUrl;
-                const totalPrice = unitPrice * quantity;
+                const product = productResult.recordset[0];
+                const totalPrice = product.Price * quantity;
 
-                // เพิ่มสินค้าลงในตาราง OrderItems พร้อมกับ UnitPrice, ProductName และ ImageUrl
                 await transaction.request()
                     .input('OrderId', sql.Int, orderId)
                     .input('ProductId', sql.Int, productId)
                     .input('Quantity', sql.Int, quantity)
-                    .input('Price', sql.Decimal(10, 2), unitPrice)
-                    .input('ImageUrl', sql.NVarChar(255), imageUrl)  // เก็บ ImageUrl ลงใน OrderItems
-                    .query('INSERT INTO OrderItems (OrderId, ProductId, Quantity, Price, ImageUrl) VALUES (@OrderId, @ProductId, @Quantity, @Price, @ImageUrl)');
+                    .input('Price', sql.Decimal(10, 2), product.Price)
+                    .input('ImageUrl', sql.NVarChar(255), product.ImageUrl)
+                    .query(`
+                        INSERT INTO OrderItems (OrderId, ProductId, Quantity, Price, ImageUrl) 
+                        VALUES (@OrderId, @ProductId, @Quantity, @Price, @ImageUrl)
+                    `);
 
-                // สะสม TotalAmount (ยอดรวมทั้งหมด)
+                // อัปเดต stock ในตาราง Products หลังจากสั่งซื้อ
+                await transaction.request()
+                    .input('Quantity', sql.Int, quantity)
+                    .input('ProductId', sql.Int, productId)
+                    .query('UPDATE Products SET Stock = Stock - @Quantity WHERE ProductId = @ProductId');
+
                 totalAmount += totalPrice;
             }
 
-            // อัปเดตยอดรวมในตาราง Orders
+            // อัปเดตยอดรวมทั้งหมดในตาราง Orders
             await transaction.request()
                 .input('OrderId', sql.Int, orderId)
                 .input('TotalAmount', sql.Decimal(10, 2), totalAmount)
@@ -259,6 +286,7 @@ router.post('/checkout', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 
 module.exports = router;

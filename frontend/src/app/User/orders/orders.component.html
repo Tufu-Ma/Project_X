@@ -1,11 +1,13 @@
 <app-header></app-header>
-<div class="orders-container">
-  <h2>Orders List</h2>
+<div class="orders-container mt-5">
+  <h2 class="text-center mb-4">Orders List</h2>
 
-  <table class="orders-table">
-    <thead>
+  <table class="table table-bordered table-striped orders-table shadow-sm">
+    <thead class="thead-dark">
       <tr>
         <th>Order ID</th>
+        <th>Product Name</th>
+        <th>Product Image</th>
         <th>Quantity</th>
         <th>Total Amount</th>
         <th>Order Status</th>
@@ -13,34 +15,58 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let order of orders">
-        <td>{{ order.OrderId }}</td>
-        <td>{{ order.Quantity }}</td>
-        <td>{{ order.TotalAmount | currency }}</td>
-        <td>{{ order.OrderStatus }}</td>
-        <td>
-          <button (click)="viewOrderDetails(order.OrderId)">View</button>
-
-          <!-- ปุ่ม Cancel -->
-          <button 
-            (click)="cancelOrder(order.OrderId)" 
-            [disabled]="order.OrderStatus !== 'Pending'"
-            class="btn btn-danger"
-            [class.disabled]="order.OrderStatus !== 'Pending'">
-            Cancel
-          </button>
-        </td>
-      </tr>
+      <ng-container *ngFor="let order of orders">
+        <tr *ngIf="order.OrderStatus !== 'Cancelled'">
+          <td>{{ order.OrderId }}</td>
+          <td>{{ order.ProductName }}</td>
+          <td>
+            <img [src]="getImageUrl(order.ProductImage)" alt="Product Image" class="img-fluid" style="width: 50px; height: 70px; object-fit: cover;">
+          </td>
+          <td>{{ order.Quantity }}</td>
+          <td>{{ order.TotalAmount | currency }}</td>
+          <td>
+            <span [ngClass]="{'text-danger': order.OrderStatus === 'Cancelled', 'text-success': order.OrderStatus === 'Pending'}">
+              {{ order.OrderStatus }}
+            </span>
+          </td>
+          <td>
+            <button 
+              (click)="cancelOrder(order.OrderId)" 
+              [disabled]="order.OrderStatus !== 'Pending'"
+              class="btn btn-danger btn-sm">
+              Cancel
+            </button>
+          </td>
+        </tr>
+      </ng-container>
     </tbody>
   </table>
 
-  <!-- แสดงรายละเอียดคำสั่งซื้อ -->
-  <div *ngIf="selectedOrder" class="order-details">
-    <h3>Order Details (ID: {{ selectedOrder.OrderId }})</h3>
-    <p><strong>Customer:</strong> {{ selectedOrder.Name }}</p>
-    <p><strong>Quantity:</strong> {{ selectedOrder.Quantity }}</p>
-    <p><strong>Total Amount:</strong> {{ selectedOrder.TotalAmount | currency }}</p>
-    <p><strong>Status:</strong> {{ selectedOrder.OrderStatus }}</p>
-    <p><strong>Order Date:</strong> {{ selectedOrder.OrderDate | date }}</p>
-  </div>
+  <h3 class="text-center mt-5">Cancelled Orders</h3>
+  <table class="table table-bordered table-striped orders-table shadow-sm">
+    <thead class="thead-dark">
+      <tr>
+        <th>Order ID</th>
+        <th>Product Name</th>
+        <th>Product Image</th>
+        <th>Quantity</th>
+        <th>Total Amount</th>
+        <th>Order Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let order of orders">
+        <tr *ngIf="order.OrderStatus === 'Cancelled'">
+          <td>{{ order.OrderId }}</td>
+          <td>{{ order.ProductName }}</td>
+          <td>
+            <img [src]="getImageUrl(order.ProductImage)" alt="Product Image" class="img-fluid" style="width: 50px; height: 70px; object-fit: cover;">
+          </td>
+          <td>{{ order.Quantity }}</td>
+          <td>{{ order.TotalAmount | currency }}</td>
+          <td class="text-danger">{{ order.OrderStatus }}</td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
 </div>

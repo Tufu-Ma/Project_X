@@ -27,7 +27,6 @@ import { AdminManageComponent } from './Admin/admin-manage/admin-manage.componen
 import { AdminProductComponent } from './Admin/admin-product/admin-product.component';
 
 // User Components
-import { ProfileComponent } from './User/profile/profile.component';
 import { ProductListComponent } from './User/product-list/product-list.component';
 
 // Services
@@ -36,7 +35,7 @@ import { ProductService } from './services/product.service';
 import { CartService } from './services/cart.service';
 import { CartComponent } from './User/cart/cart.component';
 import { OrdersComponent } from './User/orders/orders.component';
-
+import { CategoryService } from './services/categories.service';
 
 // กำหนดเส้นทางของแอปพลิเคชัน
 const routes: Routes = [
@@ -44,7 +43,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
-  { path: 'profile', component: ProfileComponent },  // เพิ่มเส้นทางไปยังหน้าโปรไฟล์
+
   { path: 'about-us', component: AboutUsComponent },
   { path: 'contact-us', component: ContactUsComponent },
   { path: 'admin-dashboard', component: AdminDashboardComponent },
@@ -75,7 +74,7 @@ const routes: Routes = [
     AdminProductComponent,
 
     // User Components
-    ProfileComponent,
+    
     ProductListComponent,
     CartComponent,
     OrdersComponent,
@@ -89,7 +88,7 @@ const routes: Routes = [
     HttpClientModule,
     NgChartsModule,
   ],
-  providers: [AuthService, ProductService, CartService],
+  providers: [AuthService, ProductService, CartService, CategoryService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

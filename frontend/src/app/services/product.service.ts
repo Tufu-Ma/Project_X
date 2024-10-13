@@ -53,4 +53,10 @@ getProductsByCategory(categoryIds: number[]): Observable<any[]> {
   const ids = categoryIds.join(',');
   return this.http.get<any[]>(`${this.apiUrl}/category?ids=${ids}`);
 }
+// ProductService
+getProductsByIds(productIds: number[]): Observable<any[]> {
+  const ids = productIds.join(',');
+  return this.http.get<any[]>(`${this.apiUrl}?ids=${ids}`); // ปรับ URL ให้เข้ากับ API ของคุณ
+}
+
 }

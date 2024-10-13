@@ -32,7 +32,7 @@ export class OrdersComponent implements OnInit {
         (data) => {
           this.orders = data; // กำหนดคำสั่งซื้อที่ดึงมาได้ให้กับอาร์เรย์ orders
         },
-        (error: any) => { // เพิ่ม type ของ error เป็น any
+        (error: any) => {
           console.error('Error fetching orders:', error);
           alert('ไม่สามารถดึงข้อมูลคำสั่งซื้อได้ กรุณาลองอีกครั้งในภายหลัง.');
         }
@@ -49,8 +49,9 @@ export class OrdersComponent implements OnInit {
       (data) => {
         this.selectedOrder = data;
       },
-      (error: any) => { // เพิ่ม type ของ error เป็น any
+      (error: any) => {
         console.error('Error fetching order details:', error);
+        alert('ไม่สามารถดึงข้อมูลรายละเอียดคำสั่งซื้อได้ กรุณาลองอีกครั้ง.');
       }
     );
   }
@@ -58,7 +59,7 @@ export class OrdersComponent implements OnInit {
   // ยกเลิกคำสั่งซื้อ
   cancelOrder(orderId: number) {
     const order = this.orders.find(order => order.OrderId === orderId);
-  
+
     // ตรวจสอบว่าคำสั่งซื้อนั้นสามารถยกเลิกได้หรือไม่
     if (order && order.OrderStatus === 'Pending') {
       if (confirm('คุณแน่ใจหรือไม่ว่าต้องการยกเลิกคำสั่งซื้อนี้?')) {
@@ -67,7 +68,7 @@ export class OrdersComponent implements OnInit {
             alert('คำสั่งซื้อถูกยกเลิกเรียบร้อยแล้ว');
             this.fetchOrders(); // รีเฟรชรายการคำสั่งซื้อหลังจากยกเลิกเรียบร้อยแล้ว
           },
-          (error: any) => { // เพิ่ม type ของ error เป็น any
+          (error: any) => {
             console.error('Error cancelling order:', error);
             alert('ไม่สามารถยกเลิกคำสั่งซื้อได้ กรุณาลองอีกครั้ง.');
           }
@@ -78,4 +79,8 @@ export class OrdersComponent implements OnInit {
     }
   }
 
+  // ฟังก์ชันสำหรับดึง URL ของภาพผลิตภัณฑ์
+  getImageUrl(imageUrl: string): string {
+    return imageUrl ? `http://localhost:3000${imageUrl}` : 'assets/default.jpg'; // เปลี่ยน URL ตามที่คุณต้องการ
+  }
 }
