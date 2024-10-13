@@ -41,7 +41,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   fetchDashboardData(): void {
-    // ดึงข้อมูลยอดขายรวม
+    // ดึงข้อมูลยอดขายรวม (ไม่รวมคำสั่งซื้อที่ถูกยกเลิก)
     this.salesService.getTotalSales().subscribe((data: any) => {
       this.totalSales = data.totalSales;  // แสดงผลรวมยอดขายทั้งหมด
       this.totalSalesData = data.sales;    // ข้อมูลตารางยอดขาย
@@ -64,11 +64,11 @@ export class AdminDashboardComponent implements OnInit {
   private mapChartData(data: any, valueField: string): any {
     console.log("Data for chart:", data); // ตรวจสอบข้อมูลที่ส่งไป
     return {
-      labels: data.map((item: any) => item.ProductName || item.date),
+      labels: data.map((item: any) => item.ProductName || item.date), // แสดงชื่อสินค้า หรือวันที่
       datasets: [
         {
-          data: data.map((item: any) => item[valueField]),
-          label: valueField === 'TotalQuantity' ? 'Total Quantity Sold' : 'Sales Quantity',
+          data: data.map((item: any) => item[valueField]), // ดึงค่าของ TotalQuantity หรือ total ขึ้นอยู่กับการส่งค่า
+          label: valueField === 'TotalQuantity' ? 'Total Quantity Sold' : 'Total Sales',
           backgroundColor: valueField === 'TotalQuantity' ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)',
         }
       ]

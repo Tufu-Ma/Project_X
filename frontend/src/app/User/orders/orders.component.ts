@@ -24,15 +24,15 @@ export class OrdersComponent implements OnInit {
       alert('คุณต้องเข้าสู่ระบบเพื่อดูคำสั่งซื้อของคุณ.');
       return;
     }
-  
+
     const userId = this.authService.getUserId(); // ดึง ID ของผู้ใช้จาก AuthService
-  
+
     if (userId !== null && typeof userId === 'number') {
       this.ordersService.getOrdersByUserId(userId).subscribe(
         (data) => {
           this.orders = data; // กำหนดคำสั่งซื้อที่ดึงมาได้ให้กับอาร์เรย์ orders
         },
-        (error) => {
+        (error: any) => { // เพิ่ม type ของ error เป็น any
           console.error('Error fetching orders:', error);
           alert('ไม่สามารถดึงข้อมูลคำสั่งซื้อได้ กรุณาลองอีกครั้งในภายหลัง.');
         }
@@ -49,24 +49,33 @@ export class OrdersComponent implements OnInit {
       (data) => {
         this.selectedOrder = data;
       },
-      (error) => {
+      (error: any) => { // เพิ่ม type ของ error เป็น any
         console.error('Error fetching order details:', error);
       }
     );
   }
 
-  // ลบคำสั่งซื้อ
-  deleteOrder(orderId: number) {
-    if (confirm('Are you sure you want to delete this order?')) {
-      this.ordersService.deleteOrder(orderId).subscribe(
-        () => {
-          this.orders = this.orders.filter(order => order.OrderId !== orderId);
-          alert('Order deleted successfully');
-        },
-        (error) => {
-          console.error('Error deleting order:', error);
-        }
-      );
+  // ยกเลิกคำสั่งซื้อ
+  cancelOrder(orderId: number) {
+    const order = this.orders.find(order => order.OrderId === orderId);
+  
+    // ตรวจสอบว่าคำสั่งซื้อนั้นสามารถยกเลิกได้หรือไม่
+    if (order && order.OrderStatus === 'Pending') {
+      if (confirm('คุณแน่ใจหรือไม่ว่าต้องการยกเลิกคำสั่งซื้อนี้?')) {
+        this.ordersService.cancelOrder(orderId).subscribe(
+          () => {
+            alert('คำสั่งซื้อถูกยกเลิกเรียบร้อยแล้ว');
+            this.fetchOrders(); // รีเฟรชรายการคำสั่งซื้อหลังจากยกเลิกเรียบร้อยแล้ว
+          },
+          (error: any) => { // เพิ่ม type ของ error เป็น any
+            console.error('Error cancelling order:', error);
+            alert('ไม่สามารถยกเลิกคำสั่งซื้อได้ กรุณาลองอีกครั้ง.');
+          }
+        );
+      }
+    } else {
+      alert('ไม่สามารถยกเลิกคำสั่งซื้อที่ไม่อยู่ในสถานะ Pending ได้');
     }
   }
+
 }

@@ -22,15 +22,18 @@ router.get('/best-selling-products', async (req, res) => {
       SELECT TOP 5 OI.ProductId, P.ProductName, SUM(OI.Quantity) as TotalQuantity, SUM(OI.TotalAmount) as TotalSales
       FROM OrderItems OI
       JOIN Products P ON OI.ProductId = P.ProductId
+      JOIN Orders O ON OI.OrderId = O.OrderId
+      WHERE O.OrderStatus != 'Cancelled'  -- กรองคำสั่งซื้อที่ยกเลิก
       GROUP BY OI.ProductId, P.ProductName
       ORDER BY SUM(OI.Quantity) DESC
-    `);  // ดึงข้อมูลสินค้าที่มียอดขายสูงสุด
+    `);
     res.json(result.recordset);
   } catch (err) {
     console.error('Error fetching best selling products:', err);
     res.status(500).json({ message: 'Error fetching best selling products', error: err.message });
   }
 });
+
 
 // ดึงข้อมูลสินค้าที่ขายได้น้อยที่สุดจากตาราง OrderItems
 router.get('/worst-selling-products', async (req, res) => {
@@ -40,9 +43,11 @@ router.get('/worst-selling-products', async (req, res) => {
       SELECT TOP 5 OI.ProductId, P.ProductName, SUM(OI.Quantity) as TotalQuantity, SUM(OI.TotalAmount) as TotalSales
       FROM OrderItems OI
       JOIN Products P ON OI.ProductId = P.ProductId
+      JOIN Orders O ON OI.OrderId = O.OrderId
+      WHERE O.OrderStatus != 'Cancelled'  -- กรองคำสั่งซื้อที่ยกเลิก
       GROUP BY OI.ProductId, P.ProductName
       ORDER BY SUM(OI.Quantity) ASC
-    `);  // ดึงข้อมูลสินค้าที่มียอดขายต่ำสุด
+    `);
     res.json(result.recordset);
   } catch (err) {
     console.error('Error fetching worst selling products:', err);
@@ -51,23 +56,25 @@ router.get('/worst-selling-products', async (req, res) => {
 });
 
 router.get('/sales-summary', async (req, res) => {
-    try {
-      const pool = await checkConnection();
-      const result = await pool.request().query(`
-        SELECT CAST(O.OrderDate AS DATE) AS date, SUM(OI.TotalAmount) AS total
-        FROM OrderItems OI
-        JOIN Orders O ON OI.OrderId = O.OrderId
-        GROUP BY CAST(O.OrderDate AS DATE)
-        ORDER BY date
-      `);
-  
-      const totalSales = result.recordset.reduce((sum, item) => sum + item.total, 0);
-      res.json({ totalSales, sales: result.recordset }); // ส่งยอดขายรวมและข้อมูลยอดขายตามวัน
-    } catch (err) {
-      console.error('Error fetching sales summary:', err);
-      res.status(500).json({ message: 'Error fetching sales summary', error: err.message });
-    }
-  });
+  try {
+    const pool = await checkConnection();
+    const result = await pool.request().query(`
+      SELECT CAST(O.OrderDate AS DATE) AS date, SUM(OI.TotalAmount) AS total
+      FROM OrderItems OI
+      JOIN Orders O ON OI.OrderId = O.OrderId
+      WHERE O.OrderStatus != 'Cancelled'  -- กรองคำสั่งซื้อที่ยกเลิก
+      GROUP BY CAST(O.OrderDate AS DATE)
+      ORDER BY date
+    `);
+
+    const totalSales = result.recordset.reduce((sum, item) => sum + item.total, 0);
+    res.json({ totalSales, sales: result.recordset }); // ส่งยอดขายรวมและข้อมูลยอดขายตามวัน
+  } catch (err) {
+    console.error('Error fetching sales summary:', err);
+    res.status(500).json({ message: 'Error fetching sales summary', error: err.message });
+  }
+});
+
   
 
 module.exports = router;

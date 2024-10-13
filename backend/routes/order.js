@@ -105,14 +105,14 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// ลบ order ตาม ID
+// ลบ order ตาม ID เฉพาะสถานะ Pending
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
         const pool = await checkConnection();
         
-        // ตรวจสอบว่ามี Order อยู่จริงก่อนลบ
+        // ตรวจสอบว่ามี Order อยู่จริงและสถานะเป็น Pending ก่อนลบ
         const checkResult = await pool.request()
             .input('OrderId', sql.Int, id)
             .query('SELECT * FROM Orders WHERE OrderId = @OrderId');
@@ -121,6 +121,14 @@ router.delete('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
+        const order = checkResult.recordset[0];
+
+        // ตรวจสอบสถานะคำสั่งซื้อ
+        if (order.OrderStatus !== 'Pending') {
+            return res.status(400).json({ message: 'Only orders with status "Pending" can be deleted' });
+        }
+
+        // ลบ Order เมื่อสถานะเป็น Pending
         await pool.request()
             .input('OrderId', sql.Int, id)
             .query('DELETE FROM Orders WHERE OrderId = @OrderId');
@@ -131,6 +139,7 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ message: 'Error deleting order' });
     }
 });
+
 // Route สำหรับกรองสินค้าตามหมวดหมู่ที่ใช้งาน
 router.get('/category/:categoryId', (req, res) => {
     const categoryId = req.params.categoryId;

@@ -1,39 +1,46 @@
 <app-header></app-header>
 <div class="orders-container">
-    <h2>Orders List</h2>
-  
-    <table class="orders-table">
-      <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Quantity</th>
-          <th>Total Amount</th>
-          <th>Order Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let order of orders">
-          <td>{{ order.OrderId }}</td>
-          <td>{{ order.Quantity }}</td>
-          <td>{{ order.TotalAmount | currency }}</td>
-          <td>{{ order.OrderStatus }}</td>
-          <td>
-            <button (click)="viewOrderDetails(order.OrderId)">View</button>
-            <button (click)="deleteOrder(order.OrderId)">Delete</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  
-    <!-- แสดงรายละเอียดคำสั่งซื้อ -->
-    <div *ngIf="selectedOrder" class="order-details">
-      <h3>Order Details (ID: {{ selectedOrder.OrderId }})</h3>
-      <p><strong>Customer:</strong> {{ selectedOrder.Name }}</p>
-      <p><strong>Quantity:</strong> {{ selectedOrder.Quantity }}</p>
-      <p><strong>Total Amount:</strong> {{ selectedOrder.TotalAmount | currency }}</p>
-      <p><strong>Status:</strong> {{ selectedOrder.OrderStatus }}</p>
-      <p><strong>Order Date:</strong> {{ selectedOrder.OrderDate | date }}</p>
-    </div>
+  <h2>Orders List</h2>
+
+  <table class="orders-table">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Quantity</th>
+        <th>Total Amount</th>
+        <th>Order Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let order of orders">
+        <td>{{ order.OrderId }}</td>
+        <td>{{ order.Quantity }}</td>
+        <td>{{ order.TotalAmount | currency }}</td>
+        <td>{{ order.OrderStatus }}</td>
+        <td>
+          <button (click)="viewOrderDetails(order.OrderId)">View</button>
+
+          <!-- ปุ่ม Cancel -->
+          <button 
+            (click)="cancelOrder(order.OrderId)" 
+            [disabled]="order.OrderStatus !== 'Pending'"
+            class="btn btn-danger"
+            [class.disabled]="order.OrderStatus !== 'Pending'">
+            Cancel
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- แสดงรายละเอียดคำสั่งซื้อ -->
+  <div *ngIf="selectedOrder" class="order-details">
+    <h3>Order Details (ID: {{ selectedOrder.OrderId }})</h3>
+    <p><strong>Customer:</strong> {{ selectedOrder.Name }}</p>
+    <p><strong>Quantity:</strong> {{ selectedOrder.Quantity }}</p>
+    <p><strong>Total Amount:</strong> {{ selectedOrder.TotalAmount | currency }}</p>
+    <p><strong>Status:</strong> {{ selectedOrder.OrderStatus }}</p>
+    <p><strong>Order Date:</strong> {{ selectedOrder.OrderDate | date }}</p>
   </div>
-  
+</div>

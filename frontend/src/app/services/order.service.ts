@@ -23,7 +23,7 @@ export class OrdersService {
 
   // ดึงคำสั่งซื้อทั้งหมดตาม UserId
   getOrdersByUserId(userId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}?userId=${userId}`); // ส่ง userId ใน query parameter
+    return this.http.get<any[]>(`${this.apiUrl}?userId=${userId}`);
   }
 
   // สร้างคำสั่งซื้อใหม่
@@ -51,4 +51,17 @@ export class OrdersService {
   deleteOrder(orderId: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${orderId}`);
   }
+
+  // ยกเลิกคำสั่งซื้อ
+  cancelOrder(orderId: number): Observable<any> {
+    const url = `${this.apiUrl}/${orderId}`;
+    const body = { OrderStatus: 'Cancelled' }; // เปลี่ยนสถานะเป็น "Cancelled"
+
+    // กำหนด headers ให้เป็น JSON
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    return this.http.put(url, body, { headers });
+  }
 }
+
+
