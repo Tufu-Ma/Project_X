@@ -6,7 +6,7 @@ const checkConnection = require('./utils/db');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const cartRoutes = require('./routes/cart');
-const orderRoutes = require('./routes/order'); // ระบุ path ที่ถูกต้อง
+const orderRoutes = require('./routes/order');
 const chartRoutes = require('./routes/chart');
 const categoriesRouter = require('./routes/categories');
 
@@ -25,7 +25,6 @@ app.use("/orders", orderRoutes);
 app.use('/chart', chartRoutes);
 app.use('/categories', categoriesRouter);
 
-
 // เช็คการเชื่อมต่อกับ SQL Server และเริ่มเซิร์ฟเวอร์
 checkConnection()
     .then(() => {
@@ -35,5 +34,5 @@ checkConnection()
     })
     .catch(err => {
         console.error("Unable to start server due to connection failure:", err);
-        process.exit(1);  // หากการเชื่อมต่อล้มเหลว ให้หยุดการทำงานของเซิร์ฟเวอร์
+        process.exit(1);
     });

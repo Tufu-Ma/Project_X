@@ -37,6 +37,7 @@ import { CartComponent } from './User/cart/cart.component';
 import { OrdersComponent } from './User/orders/orders.component';
 import { CategoryService } from './services/categories.service';
 
+
 // กำหนดเส้นทางของแอปพลิเคชัน
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -78,6 +79,7 @@ const routes: Routes = [
     ProductListComponent,
     CartComponent,
     OrdersComponent,
+
   ],
   imports: [
     BrowserModule,

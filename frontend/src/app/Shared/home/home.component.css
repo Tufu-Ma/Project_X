@@ -1,43 +1,44 @@
-.card-container {
-  justify-content: center;
-  display: flex;
-  flex-wrap: nowrap; /* การ์ดเรียงในแนวนอน /
-  overflow-x: auto; / เลื่อนแนวนอนได้ถ้าจำเป็น /
-  gap: 10px; / ช่องว่างระหว่างการ์ด /
-  padding: 10px; / Padding รอบๆ คอนเทนเนอร์ /
+.carousel-item img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
 }
 
 .card {
-  display: flex;
-  flex-direction: column;
-  max-width: 200px; / กำหนดความกว้างสูงสุดของการ์ด /
-  text-align: center;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  margin: 1px; /* เพิ่มช่องว่างรอบ ๆ การ์ดแต่ละใบ */
+  border: 1px solid #ddd;
+  border-radius: 1rem;
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
 }
 
-.card-img-top {
-  width: 100%; / ให้รูปภาพขยายเต็มความกว้างของการ์ด /
-  height: auto; / ให้ความสูงของรูปภาพปรับอัตโนมัติตามสัดส่วน /
-  max-height: 150px; / จำกัดความสูงสูงสุดของรูปภาพเป็น 150px /
-  object-fit: cover; / ให้รูปภาพครอบคลุมพื้นที่ที่กำหนดไว้ โดยรักษาสัดส่วนของภาพ /
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card img {
+  border-radius: 8px;
+  width: 100%;
+  height: 200px; /* กำหนดความสูงของรูป */
+  object-fit: cover; /* ทำให้รูปภาพครอบคลุมพอดีกับพื้นที่ */
 }
 
 .card-body {
-  padding: 16px;
-}
-footer .col p,
-footer .col h5,
-footer .col ul li a {
-    font-size: 0.875rem; / Adjust this value as needed */
-}
-html, body {
-  height: 100%;
+  text-align: center;
 }
 
-body {
-  display: flex;
-  flex-direction: column;
+.container {
+  margin-top: 20px;
+}
+
+.list-unstyled {
+  padding: 0;
+}
+
+.list-unstyled li {
+  margin-bottom: 20px;
+}
+
+.bd-placeholder-img {
+  object-fit: cover;
+  border-radius: 8px;
 }

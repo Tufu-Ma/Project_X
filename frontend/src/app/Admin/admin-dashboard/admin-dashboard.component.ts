@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ChartType } from 'chart.js';  // นำเข้า ChartType จาก chart.js
+import { ChartType } from 'chart.js';
 import { SalesService } from '../../services/sales.service';
 
-// สร้างอินเทอร์เฟซสำหรับข้อมูลผลิตภัณฑ์
 interface Product {
   ProductName: string;
   TotalQuantity: number;
@@ -15,63 +14,97 @@ interface Product {
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
+  startDate: string = '';
+  endDate: string = '';
   totalSales = 0;
   bestSellingProducts: Product[] = [];
   worstSellingProducts: Product[] = [];
-  totalSalesData: any[] = [];  // สำหรับตารางยอดขายรวม
-
+  totalSalesData: any[] = [];
+  
   bestSellingChartData: any;
   worstSellingChartData: any;
-  totalSalesChartData: any;  // สำหรับกราฟยอดขายรวม
+  totalSalesChartData: any;
 
   chartOptions = {
     responsive: true
   };
   chartLegend = true;
-  
-  // กำหนดชนิดของกราฟ
-  totalSalesChartType: ChartType = 'line';  // กราฟยอดขายรวมเป็นเส้น
-  bestSellingChartType: ChartType = 'bar';   // กราฟสินค้าขายดีเป็นแท่ง
-  worstSellingChartType: ChartType = 'bar';   // กราฟสินค้าขายไม่ดีเป็นแท่ง
+
+  totalSalesChartType: ChartType = 'line';
+  bestSellingChartType: ChartType = 'bar';
+  worstSellingChartType: ChartType = 'bar';
 
   constructor(private salesService: SalesService) {}
 
   ngOnInit(): void {
+    const today = new Date();
+    this.startDate = today.toISOString().split('T')[0];
+    this.endDate = today.toISOString().split('T')[0];
     this.fetchDashboardData();
   }
 
   fetchDashboardData(): void {
-    // ดึงข้อมูลยอดขายรวม (ไม่รวมคำสั่งซื้อที่ถูกยกเลิก)
-    this.salesService.getTotalSales().subscribe((data: any) => {
-      this.totalSales = data.totalSales;  // แสดงผลรวมยอดขายทั้งหมด
-      this.totalSalesData = data.sales;    // ข้อมูลตารางยอดขาย
-      this.totalSalesChartData = this.mapChartData(data.sales, 'total');  // สร้างข้อมูลสำหรับกราฟยอดขายรวม
+    if (!this.startDate || !this.endDate) {
+      console.error('Start date and end date are required.');
+      return;
+    }
+
+    this.salesService.getTotalSales(this.startDate, this.endDate).subscribe(
+      (data: any) => {
+        this.totalSales = data.totalSales;
+        this.totalSalesData = data.sales;
+        this.totalSalesChartData = this.mapChartData(data.sales, 'total');
+        console.log('Total Sales Chart Data:', this.totalSalesChartData); // ตรวจสอบข้อมูลกราฟ
+      },
+      (error) => {
+        console.error('Error fetching sales data:', error);
+      }
+    );
+
+    this.salesService.getBestSellingProducts(this.startDate, this.endDate).subscribe((data: Product[]) => {
+      this.bestSellingProducts = data.sort((a: Product, b: Product) => b.TotalQuantity - a.TotalQuantity);
+      this.bestSellingChartData = this.mapChartData(this.bestSellingProducts, 'TotalQuantity');
     });
-  
-    // ดึงข้อมูลสินค้าที่ขายดีที่สุด
-    this.salesService.getBestSellingProducts().subscribe((data: Product[]) => {
-      this.bestSellingProducts = data.sort((a: Product, b: Product) => b.TotalQuantity - a.TotalQuantity); // เรียงตามจำนวนชิ้นที่ขายได้
-      this.bestSellingChartData = this.mapChartData(this.bestSellingProducts, 'TotalQuantity');  // สร้างข้อมูลสำหรับกราฟสินค้าขายดีตามจำนวนชิ้น
-    });
-  
-    // ดึงข้อมูลสินค้าที่ขายไม่ดี
-    this.salesService.getWorstSellingProducts().subscribe((data: Product[]) => {
-      this.worstSellingProducts = data.sort((a: Product, b: Product) => a.TotalQuantity - b.TotalQuantity); // เรียงตามจำนวนชิ้นที่ขายได้
-      this.worstSellingChartData = this.mapChartData(this.worstSellingProducts, 'TotalQuantity');  // สร้างข้อมูลสำหรับกราฟสินค้าขายไม่ดีตามจำนวนชิ้น
+
+    this.salesService.getWorstSellingProducts(this.startDate, this.endDate).subscribe((data: Product[]) => {
+      this.worstSellingProducts = data.sort((a: Product, b: Product) => a.TotalQuantity - b.TotalQuantity);
+      this.worstSellingChartData = this.mapChartData(this.worstSellingProducts, 'TotalQuantity');
     });
   }
-  
+
   private mapChartData(data: any, valueField: string): any {
-    console.log("Data for chart:", data); // ตรวจสอบข้อมูลที่ส่งไป
     return {
-      labels: data.map((item: any) => item.ProductName || item.date), // แสดงชื่อสินค้า หรือวันที่
+      labels: data.map((item: any) => item.date || item.ProductName), // แสดงวันที่หรือชื่อสินค้า
       datasets: [
         {
-          data: data.map((item: any) => item[valueField]), // ดึงค่าของ TotalQuantity หรือ total ขึ้นอยู่กับการส่งค่า
+          data: data.map((item: any) => item[valueField]),
           label: valueField === 'TotalQuantity' ? 'Total Quantity Sold' : 'Total Sales',
           backgroundColor: valueField === 'TotalQuantity' ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)',
         }
       ]
     };
+  }
+
+  downloadReport(): void {
+    if (!this.startDate || !this.endDate) {
+      alert('Please select both start and end dates.');
+      return;
+    }
+
+    this.salesService.downloadSalesReport(this.startDate, this.endDate).subscribe(
+      (response) => {
+        const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'SalesReport.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      },
+      (error) => {
+        console.error('Error downloading report:', error);
+      }
+    );
   }
 }

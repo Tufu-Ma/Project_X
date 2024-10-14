@@ -5,7 +5,13 @@
   <div *ngIf="product; else noProduct">
     <div class="row">
       <div class="col-md-6">
-        <img class="img-fluid" [src]="getImageUrl(product.ImageUrl)" alt="{{ product.ProductName }}" />
+        <!-- ปรับขนาดรูปภาพให้เป็น 450x450 px -->
+        <img 
+          class="img-fluid" 
+          [src]="getImageUrl(product.ImageUrl)" 
+          alt="{{ product.ProductName }}" 
+          style="width: 450px; height: 450px; object-fit: cover;"
+        />
       </div>
 
       <div class="col-md-6">

@@ -35,7 +35,7 @@ export class HeaderComponent {
   // ฟังก์ชันสำหรับการค้นหาเมื่อกดปุ่มค้นหา
   onSearch(): void {
     if (this.searchTerm) {
-      this.router.navigate(['/product-list'], { queryParams: { search: this.searchTerm } });
+      this.router.navigate(['/product-list'], { queryParams: { search: this.searchTerm } }); // ส่งคำค้นหาไปที่หน้า product-list พร้อม query params
       this.suggestions = []; // เคลียร์คำแนะนำ
     } else {
       // หากไม่มีคำค้นหาให้แสดงสินค้าทั้งหมด

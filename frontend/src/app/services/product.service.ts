@@ -59,4 +59,9 @@ getProductsByIds(productIds: number[]): Observable<any[]> {
   return this.http.get<any[]>(`${this.apiUrl}?ids=${ids}`); // ปรับ URL ให้เข้ากับ API ของคุณ
 }
 
+ // ฟังก์ชันค้นหาสินค้า
+ searchProducts(searchTerm: string): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/search?term=${searchTerm}`);  // ส่งคำค้นหาไปที่ API
+}
+
 }

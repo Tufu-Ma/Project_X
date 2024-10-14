@@ -12,7 +12,7 @@ export class ProductListComponent implements OnInit {
   products: any[] = [];  // เก็บรายการสินค้าทั้งหมด
   categories: any[] = [];  // เก็บรายการหมวดหมู่
   selectedCategoryIds: number[] = [];  // เก็บ CategoryId ที่ถูกเลือก (แบบ array)
-  searchTerm: string = '';  // เก็บค่าคำค้นหา
+  searchTerm: string = '';  // เก็บค่าคำค้นหาที่ส่งมาจาก header
   groupedProducts: { [key: string]: any[] } = {};  // แยกสินค้าตามหมวดหมู่
 
   constructor(
@@ -23,7 +23,7 @@ export class ProductListComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      this.searchTerm = params['search'] || '';  // รับค่าจาก query param 'search'
+      this.searchTerm = params['search'] || '';  // รับค่าจาก query param 'search' ที่มาจาก header
       this.getCategories();  // เรียกดึงหมวดหมู่
       this.getProducts();  // ดึงสินค้าทั้งหมดในครั้งแรก
     });
@@ -41,36 +41,44 @@ export class ProductListComponent implements OnInit {
     );
   }
 
-  // ดึงสินค้าทั้งหมดจาก ProductService
+  // ดึงสินค้าทั้งหมดหรือสินค้าตามหมวดหมู่ที่เลือก
   getProducts(): void {
-    if (this.selectedCategoryIds.length > 0) {
-      // กรณีมีการเลือกหมวดหมู่ ให้ดึงเฉพาะสินค้าที่อยู่ในหมวดหมู่นั้น
-      this.productService.getProductsByCategory(this.selectedCategoryIds).subscribe(
-        response => {
-          this.products = response;
-          this.groupProductsByCategory();  // เรียกใช้ฟังก์ชันกรองสินค้า
-        },
-        error => {
-          console.error('Error fetching products by category:', error);
-        }
-      );
-    } else {
-      // กรณีไม่มีการเลือกหมวดหมู่ ให้ดึงสินค้าทั้งหมด
-      this.productService.getProducts().subscribe(
-        response => {
-          this.products = response;  // เก็บข้อมูลสินค้าที่ได้รับจาก API
-          this.groupProductsByCategory();  // แยกสินค้าตามหมวดหมู่
-        },
-        error => {
-          console.error('Error fetching products:', error);
-        }
+    this.productService.getProducts().subscribe(
+      response => {
+        this.products = response;  // เก็บข้อมูลสินค้าที่ได้รับจาก API
+        this.filterProducts(); // กรองสินค้าตามหมวดหมู่และคำค้นหาที่เลือก
+      },
+      error => {
+        console.error('Error fetching products:', error);
+      }
+    );
+  }
+
+  // ฟังก์ชันสำหรับกรองสินค้าตามหมวดหมู่และคำค้นหาที่เลือก
+  filterProducts(): void {
+    let filteredProducts = this.products;
+
+    // ถ้ามีคำค้นหา ให้กรองสินค้าตามคำค้นหา
+    if (this.searchTerm.trim() !== '') {
+      filteredProducts = filteredProducts.filter(product =>
+        product.ProductName.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     }
+
+    // ถ้ามีการเลือกหมวดหมู่ ให้กรองสินค้าตามหมวดหมู่ที่เลือก
+    if (this.selectedCategoryIds.length > 0) {
+      filteredProducts = filteredProducts.filter(product =>
+        this.selectedCategoryIds.includes(product.CategoryId)
+      );
+    }
+
+    // แสดงสินค้าทั้งหมดถ้าไม่มีการเลือกหมวดหมู่และไม่มีคำค้นหา
+    this.groupProductsByCategory(filteredProducts);
   }
 
   // ฟังก์ชันสำหรับแยกสินค้าตามหมวดหมู่
-  groupProductsByCategory(): void {
-    this.groupedProducts = this.products.reduce((groups: any, product: any) => {
+  groupProductsByCategory(filteredProducts: any[]): void {
+    this.groupedProducts = filteredProducts.reduce((groups: any, product: any) => {
       const category = this.categories.find(c => c.CategoryId === product.CategoryId);
       const categoryName = category ? category.CategoryName : 'Other';  // ถ้าไม่มีหมวดหมู่, ใส่ใน 'Other'
 
@@ -86,36 +94,15 @@ export class ProductListComponent implements OnInit {
   // ฟังก์ชันเมื่อมีการเปลี่ยนหมวดหมู่
   onCategoryChange(event: any): void {
     const selectedCategoryId = Number(event.target.value);
-    
+
     if (event.target.checked) {
       this.selectedCategoryIds.push(selectedCategoryId); // ถ้าเลือกให้เพิ่ม
     } else {
       this.selectedCategoryIds = this.selectedCategoryIds.filter(id => id !== selectedCategoryId); // ถ้าไม่เลือกให้ลบ
     }
-    
-    this.getProducts();  // ดึงสินค้าตามหมวดหมู่ที่เลือก
+
+    this.filterProducts();  // กรองสินค้าตามหมวดหมู่และคำค้นหาที่เลือก
   }
-
- // ปรับฟังก์ชันกรองสินค้า
-filterProducts(): void {
-  if (this.searchTerm.trim() === '') {
-    this.getProducts(); // แสดงสินค้าทั้งหมด
-  } else {
-    this.groupedProducts = this.products.reduce((groups: any, product: any) => {
-      const category = this.categories.find(c => c.CategoryId === product.CategoryId);
-      const categoryName = category ? category.CategoryName : 'Other'; 
-
-      if (product.ProductName.toLowerCase().includes(this.searchTerm.toLowerCase())) {
-        if (!groups[categoryName]) {
-          groups[categoryName] = [];
-        }
-        groups[categoryName].push(product);
-      }
-
-      return groups;
-    }, {});
-  }
-}
 
   // ฟังก์ชันสำหรับนำทางไปยังหน้ารายละเอียดสินค้า
   goToProductDetail(productId: number): void {
