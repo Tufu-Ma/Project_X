@@ -115,4 +115,10 @@ export class CartComponent implements OnInit {
       this.updateCartItem(item.CartId, item.Quantity); // อัปเดตจำนวนสินค้าในรถเข็น
     }
   }
+
+  // ฟังก์ชันสำหรับดึง URL ของภาพผลิตภัณฑ์
+getImageUrl(imageUrl: string): string {
+  return imageUrl ? `http://localhost:3000${imageUrl}` : 'assets/default.jpg'; // คืนค่าที่อยู่ภาพ
+}
+
 }

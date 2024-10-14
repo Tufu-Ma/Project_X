@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OrdersService } from '../../services/order.service';
 import { AuthService } from '../../auth.service';
+import { ProductService } from '../../services/product.service'; // นำเข้า ProductService
 
 @Component({
   selector: 'app-orders',
@@ -11,7 +12,11 @@ export class OrdersComponent implements OnInit {
   orders: any[] = [];
   selectedOrder: any = null;
 
-  constructor(private ordersService: OrdersService, private authService: AuthService) {}
+  constructor(
+    private ordersService: OrdersService, 
+    private authService: AuthService, 
+    private productService: ProductService // เพิ่ม ProductService
+  ) {}
 
   ngOnInit(): void {
     this.fetchOrders();
@@ -31,6 +36,26 @@ export class OrdersComponent implements OnInit {
       this.ordersService.getOrdersByUserId(userId).subscribe(
         (data) => {
           this.orders = data; // กำหนดคำสั่งซื้อที่ดึงมาได้ให้กับอาร์เรย์ orders
+
+          // ดึงข้อมูลภาพของผลิตภัณฑ์จาก ProductService
+          const productIds = this.orders.map(order => order.ProductId);
+          if (productIds.length > 0) {
+            this.productService.getProductsByIds(productIds).subscribe(
+              (products) => {
+                // แทนที่ข้อมูลภาพในคำสั่งซื้อ
+                this.orders = this.orders.map(order => {
+                  const product = products.find(p => p.ProductId === order.ProductId);
+                  return {
+                    ...order,
+                    ProductImage: product ? product.ImageUrl : 'assets/default.jpg', // ใช้ URL ของภาพที่ถูกต้อง
+                  };
+                });
+              },
+              (error) => {
+                console.error('Error fetching products:', error);
+              }
+            );
+          }
         },
         (error: any) => {
           console.error('Error fetching orders:', error);
@@ -81,6 +106,6 @@ export class OrdersComponent implements OnInit {
 
   // ฟังก์ชันสำหรับดึง URL ของภาพผลิตภัณฑ์
   getImageUrl(imageUrl: string): string {
-    return imageUrl ? `http://localhost:3000${imageUrl}` : 'assets/default.jpg'; // เปลี่ยน URL ตามที่คุณต้องการ
+    return imageUrl ? `http://localhost:3000${imageUrl}` : 'assets/default.jpg'; // คืนค่าที่อยู่ภาพ
   }
 }
