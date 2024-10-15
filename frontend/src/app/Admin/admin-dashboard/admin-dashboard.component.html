@@ -1,61 +1,133 @@
 <app-header></app-header>
-<div class="dashboard-container">
-  <nav class="sidebar">
-    <ul>
-      <li><a href="#">Dashboard</a></li>
-      <li><a href="#">Orders</a></li>
-      <li><a routerLink="/home">Products</a></li>
-      <li><a href="#">Users</a></li>
-      <li><a href="#">Reports</a></li>
-      <li><a routerLink="/admin-product">Product Management</a></li>
-    </ul>
-  </nav>
+<div class="container mt-5">
+  <h2 class="text-center">Sales Dashboard</h2>
 
-  <div class="main-content">
-    <header class="top-bar">
-      <div class="profile-section">
-        <span>Admin</span>
-        <button class="logout-btn">Logout</button>
-      </div>
-    </header>
+  <!-- วันที่เริ่มต้นและสิ้นสุด -->
+  <div class="row mb-4 align-items-end">
+    <div class="col-md-6">
+      <label for="startDate">Start Date</label>
+      <input type="date" id="startDate" [(ngModel)]="startDate" class="form-control" />
+    </div>
+    <div class="col-md-6">
+      <label for="endDate">End Date</label>
+      <input type="date" id="endDate" [(ngModel)]="endDate" class="form-control" />
+    </div>
+  </div>
 
-    <section class="stats-overview">
-      <div class="stat-card">
-        <h3>Total Sales</h3>
-        <p>$50,000</p>
+  <!-- ปุ่ม Fetch Data และ Download Report -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <button (click)="fetchDashboardData()" class="btn btn-primary mb-4">Fetch Data</button>
+    </div>
+    <div class="col-md-6 text-md-right">
+      <button (click)="downloadReport()" class="btn btn-success mb-4">Download Report</button>
+    </div>
+  </div>
+
+  <!-- กราฟรวมยอดขายและสินค้าขายดีที่สุด/แย่ที่สุด -->
+  <section class="row stats-overview">
+    <!-- กราฟยอดขายรวม -->
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm stat-card">
+        <div class="card-body">
+          <h3 class="card-title">Total Sales Graph</h3>
+          <canvas *ngIf="totalSalesChartData" baseChart
+            [datasets]="totalSalesChartData.datasets"
+            [labels]="totalSalesChartData.labels"
+            [options]="chartOptions"
+            [legend]="false"
+            [type]="totalSalesChartType"
+            style="width: 100%; height: 400px;">
+          </canvas>
+        </div>
       </div>
-      <div class="stat-card">
-        <h3>New Orders</h3>
-        <p>120</p>
+    </div>
+
+    <!-- กราฟสินค้าขายดี/ขายแย่ -->
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm stat-card">
+        <div class="card-body">
+          <h3 class="card-title">Best & Worst Selling Products</h3>
+          <canvas *ngIf="bestSellingChartData" baseChart
+            [datasets]="bestSellingChartData.datasets"
+            [labels]="bestSellingChartData.labels"
+            [options]="chartOptions"
+            [legend]="false"
+            [type]="bestSellingChartType"
+            style="width: 100%; height: 200px;">
+          </canvas>
+          <hr>
+          <canvas *ngIf="worstSellingChartData" baseChart
+            [datasets]="worstSellingChartData.datasets"
+            [labels]="worstSellingChartData.labels"
+            [options]="chartOptions"
+            [legend]="false"
+            [type]="worstSellingChartType"
+            style="width: 100%; height: 200px;">
+          </canvas>
+        </div>
       </div>
-      <div class="stat-card">
-        <h3>Active Users</h3>
-        <p>350</p>
-      </div>
-      <div class="stat-card">
-        <h3>Revenue</h3>
-        <p>$5,000</p>
-      </div>
-    </section>
+    </div>
+  </section>
+
+  <!-- ตารางยอดขายรวม -->
+  <h3 class="mb-3">Total Sales Table</h3>
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead class="table-dark">
+        <tr>
+          <th>Date</th>
+          <th>Total Sales</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let sale of totalSalesData">
+          <td>{{ sale.date }}</td>
+          <td>{{ sale.total | currency }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ตารางสินค้าขายดี -->
+  <h3 class="mb-3">Best Selling Products Table</h3>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead class="table-dark">
+        <tr>
+          <th>Product Name</th>
+          <th>Total Quantity Sold</th>
+          <th>Total Sales</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of bestSellingProducts">
+          <td>{{ product.ProductName }}</td>
+          <td>{{ product.TotalQuantity }}</td>
+          <td>{{ product.TotalSales | currency }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ตารางสินค้าขายแย่ -->
+  <h3 class="mb-3">Worst Selling Products Table</h3>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead class="table-dark">
+        <tr>
+          <th>Product Name</th>
+          <th>Total Quantity Sold</th>
+          <th>Total Sales</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of worstSellingProducts">
+          <td>{{ product.ProductName }}</td>
+          <td>{{ product.TotalQuantity }}</td>
+          <td>{{ product.TotalSales | currency }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
-<div>
-  <label for="filter">Filter by:</label>
-  <select id="filter" (change)="applyFilter($event)">
-    <option value="">Select Filter</option>
-    <option value="date">Date</option>
-    <option value="product">Product</option>
-    <!-- ตัวกรองอื่นๆ -->
-  </select>
-  
-</div>
-
-<table>
-  <!-- การแสดงข้อมูล salesData ในตาราง -->
-  <tr *ngFor="let sale of salesData">
-    <td>{{ sale.productName }}</td>
-    <td>{{ sale.saleDate }}</td>
-    <td>{{ sale.amount }}</td>
-    <!-- คอลัมน์อื่นๆ -->
-  </tr>
-</table>

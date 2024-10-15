@@ -1,21 +1,25 @@
 <app-header></app-header>
 <div class="container mt-5">
-  <h2>Product Details</h2>
+  <h2>{{ product?.ProductName }}</h2>
 
   <div *ngIf="product; else noProduct">
-    <!-- แสดงรายละเอียดสินค้า -->
     <div class="row">
       <div class="col-md-6">
-        <!-- ภาพสินค้า -->
-        <img [src]="product.ImageUrl" alt="{{ product.ProductName }}" class="img-fluid">
+        <!-- ปรับขนาดรูปภาพให้เป็น 450x450 px -->
+        <img 
+          class="img-fluid" 
+          [src]="getImageUrl(product.ImageUrl)" 
+          alt="{{ product.ProductName }}" 
+          style="width: 450px; height: 450px; object-fit: cover;"
+        />
       </div>
 
       <div class="col-md-6">
         <h3>{{ product.ProductName }}</h3>
         <p>{{ product.Description }}</p>
         <p>Price: ฿{{ product.Price | number:'1.2-2' }}</p>
+        <p>In Stock: {{ product.Stock }}</p>
 
-        <!-- เลือกจำนวนสินค้า -->
         <div class="quantity-selector">
           <button class="btn btn-outline-secondary" (click)="updateQuantity(-1)">-</button>
           <input type="number" class="form-control d-inline text-center" [value]="quantity" style="width: 60px;" readonly>
@@ -23,7 +27,10 @@
         </div>
 
         <!-- ปุ่มเพิ่มสินค้าในตะกร้า -->
-        <button class="btn btn-primary mt-3" (click)="addToCart()">Add to Cart</button>
+<button class="btn btn-primary mt-3" (click)="addToCart()" [disabled]="product.Stock <= 0">
+  {{ product.Stock > 0 ? 'เพิ่มไปยังรถเข็น' : 'สินค้าหมด' }}
+</button>
+       
       </div>
     </div>
   </div>

@@ -1,26 +1,51 @@
+/* Container สำหรับคำสั่งซื้อ */
 .orders-container {
-    margin: 20px;
-  }
-  
-  .orders-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-  
-  .orders-table th, .orders-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-  }
-  
-  .orders-table th {
-    background-color: #f2f2f2;
-  }
-  
-  .order-details {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border: 1px solid #ddd;
-  }
-  
+  max-width: 1270px; /* เพิ่มความกว้างสูงสุดเป็น 1200px */
+  margin: 0 auto; /* จัดกลาง */
+  padding: 20px; /* เพิ่ม padding รอบๆ */
+  background-color: #f8f9fa; /* สีพื้นหลัง */
+  border-radius: 8px; /* มุมที่โค้ง */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* เงา */
+}
+
+/* สไตล์ของตารางคำสั่งซื้อ */
+.orders-table {
+  width: 100%; /* ให้ตารางเต็มความกว้าง */
+  border-collapse: collapse; /* ทำให้เส้นขอบติดกัน */
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 12px; /* เพิ่ม padding ภายในเซลล์ */
+  text-align: left; /* จัดข้อความไปทางซ้าย */
+}
+
+.orders-table th {
+  background-color: #343a40; /* สีพื้นหลังสำหรับส่วนหัว */
+  color: white; /* สีตัวอักษร */
+}
+
+/* สไตล์สำหรับแถวที่ถูกยกเลิก */
+.table-danger {
+  background-color: #f8d7da; /* สีพื้นหลังสำหรับแถวที่ยกเลิก */
+}
+
+/* สไตล์สำหรับปุ่ม */
+.btn {
+  margin-top: 5px; /* เว้นระยะห่างบนปุ่ม */
+}
+
+/* การจัดรูปภาพสินค้า */
+img {
+  border-radius: 5px; /* ทำให้รูปภาพมีมุมที่โค้ง */
+}
+
+/* ข้อความที่แสดงภายในคำสั่งซื้อ */
+.order-details {
+  margin-top: 20px; /* เว้นระยะห่างด้านบน */
+  padding: 15px; /* เพิ่ม padding */
+  background-color: #fff; /* สีพื้นหลังขาว */
+  border: 1px solid #dee2e6; /* เส้นขอบ */
+  border-radius: 5px; /* มุมที่โค้ง */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* เงา */
+}

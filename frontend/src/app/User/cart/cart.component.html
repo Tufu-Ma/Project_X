@@ -1,3 +1,4 @@
+<app-header></app-header>
 <div class="container mt-5">
   <h2 class="text-center">My Cart</h2>
 
@@ -19,7 +20,7 @@
           <tr *ngFor="let item of cartItems">
             <td>{{ item.ProductName }}</td>
             <td>
-              <img [src]="item.ImageUrl" alt="{{ item.ProductName }}" class="img-fluid" style="width: 50px; height: 50px;" />
+              <img [src]="getImageUrl(item.ImageUrl)" alt="{{ item.ProductName }}" class="img-fluid" style="width: 50px; height: 50px;" />
             </td>
             <td>{{ item.Price | currency }}</td>
             <td>
@@ -51,7 +52,7 @@
             
             <li class="list-group-item d-flex justify-content-between bg-light">
               <strong>Total </strong>
-              <strong>{{ total| currency }}</strong>
+              <strong>{{ total | currency }}</strong>
             </li>
           </ul>
           <button class="btn btn-primary btn-block" (click)="checkout()">Place Order</button>

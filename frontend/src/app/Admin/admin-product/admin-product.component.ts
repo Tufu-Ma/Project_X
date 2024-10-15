@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
+import { CategoryService } from '../../services/categories.service';
+
 
 @Component({
   selector: 'app-admin-product',
@@ -9,12 +11,19 @@ import { ProductService } from '../../services/product.service';
 })
 export class AdminProductComponent implements OnInit {
   products: any[] = [];
+  categories: any[] = []; // เพิ่มตัวแปรสำหรับเก็บหมวดหมู่
   productForm: FormGroup;
   selectedFile: File | null = null;
   isEditMode = false;
+  isAddingNewCategory = false; // เพิ่มตัวแปรสำหรับเช็คว่ากำลังเพิ่มหมวดหมู่ใหม่หรือไม่
   selectedProductId: number | null = null;
+  newCategoryName: string = ''; // เก็บชื่อหมวดหมู่ใหม่ที่ต้องการเพิ่ม
 
-  constructor(private productService: ProductService, private fb: FormBuilder) {
+  constructor(
+    private productService: ProductService, 
+    private categoryService: CategoryService, // ใช้ชื่อที่สอดคล้องกัน
+    private fb: FormBuilder
+  ) {
     this.productForm = this.fb.group({
       productName: ['', Validators.required],
       categoryId: ['', Validators.required],
@@ -28,28 +37,69 @@ export class AdminProductComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProducts();
-  }
+    this.loadCategories(); // ต้องมีการเรียกฟังก์ชันนี้
+  }  
+
+  // ฟังก์ชันสำหรับโหลดหมวดหมู่
+loadCategories(): void {
+  this.categoryService.getCategories().subscribe(
+    (response: any[]) => {
+      // กรองหมวดหมู่ที่มีสถานะ 'Active'
+      this.categories = response.filter(category => category.Status === 'Active');
+    },
+    (error) => {
+      console.error('Error fetching categories:', error);
+    }
+  );
+}  
+
 
   loadProducts(): void {
     this.productService.getProducts().subscribe(
-      response => {
+      (response: any[]) => {
         this.products = response;
       },
-      error => {
+      (error) => {
         console.error('Error fetching products:', error);
       }
     );
   }
-
-  onFileSelected(event: any): void {
-    this.selectedFile = event.target.files[0];
-  }
-  onSubmit(): void {
-    const formData = new FormData();
-    
-    // ตรวจสอบค่าก่อนส่ง
-    console.log('Form Data:', this.productForm.value);
   
+  // ฟังก์ชันตรวจสอบเมื่อเปลี่ยนหมวดหมู่ใน dropdown
+  onCategoryChange(event: any): void {
+    const selectedValue = event.target.value;
+    if (selectedValue == -1) {
+      this.isAddingNewCategory = true; // ถ้าผู้ใช้เลือกเพิ่มหมวดหมู่ใหม่
+    } else {
+      this.isAddingNewCategory = false; // ถ้าเป็นการเลือกหมวดหมู่ที่มีอยู่แล้ว
+    }
+  }
+
+  // เพิ่มการส่งค่า Status เมื่อเพิ่มหมวดหมู่ใหม่
+addCategory(): void {
+  if (this.newCategoryName.trim() !== '') {
+    this.categoryService.addCategory({ CategoryName: this.newCategoryName, Status: 'Active' }).subscribe(
+      response => {
+        console.log('Category added successfully:', response);
+        this.loadCategories(); // โหลดหมวดหมู่ใหม่หลังจากเพิ่มสำเร็จ
+        this.isAddingNewCategory = false; // กลับไปยังโหมดปกติ
+        this.newCategoryName = ''; // รีเซ็ตชื่อหมวดหมู่ใหม่
+      },
+      error => {
+        console.error('Error adding category:', error);
+      }
+    );
+  }
+}
+
+
+  onSubmit(): void {
+    if (this.productForm.invalid) {
+      console.error('Form is invalid');
+      return; // ถ้าฟอร์มไม่ถูกต้อง หยุดทำงาน
+    }
+
+    const formData = new FormData();
     formData.append('productName', this.productForm.get('productName')?.value);
     formData.append('categoryId', this.productForm.get('categoryId')?.value);
     formData.append('description', this.productForm.get('description')?.value);
@@ -57,35 +107,28 @@ export class AdminProductComponent implements OnInit {
     formData.append('stock', this.productForm.get('stock')?.value);
     formData.append('brand', this.productForm.get('brand')?.value);
     formData.append('model', this.productForm.get('model')?.value);
-  
-    // ถ้ามีไฟล์ถูกเลือก
+
     if (this.selectedFile) {
-      console.log('Uploading file:', this.selectedFile);
       formData.append('image', this.selectedFile, this.selectedFile.name);
     }
-  
-    // ตรวจสอบว่ากำลังอยู่ในโหมดแก้ไขหรือไม่
+
     if (this.isEditMode && this.selectedProductId) {
-      console.log('Editing product with ID:', this.selectedProductId);
-      // ถ้าอยู่ในโหมดแก้ไขให้เรียกฟังก์ชัน updateProduct
       this.productService.updateProduct(this.selectedProductId, formData).subscribe(
         () => {
           console.log('Product updated successfully');
-          this.loadProducts();  // โหลดสินค้าหลังจากอัปเดต
-          this.resetForm();  // รีเซ็ตฟอร์มหลังจากอัปเดต
+          this.loadProducts();
+          this.resetForm();
         },
         error => {
           console.error('Error updating product:', error);
         }
       );
     } else {
-      console.log('Adding new product');
-      // ถ้าไม่อยู่ในโหมดแก้ไขให้เรียกฟังก์ชัน addProduct
       this.productService.addProduct(formData).subscribe(
         () => {
           console.log('Product added successfully');
-          this.loadProducts();  // โหลดสินค้าหลังจากเพิ่มเสร็จ
-          this.resetForm();  // รีเซ็ตฟอร์ม
+          this.loadProducts();
+          this.resetForm();
         },
         error => {
           console.error('Error adding product:', error);
@@ -93,21 +136,19 @@ export class AdminProductComponent implements OnInit {
       );
     }
   }
-  
-  // ฟังก์ชันสำหรับรีเซ็ตฟอร์มหลังการเพิ่มหรือแก้ไขสินค้า
+
   resetForm(): void {
-    this.isEditMode = false;  // ออกจากโหมดแก้ไขหลังจากรีเซ็ตฟอร์ม
+    this.isEditMode = false;
     this.selectedProductId = null;
     this.productForm.reset();
     this.selectedFile = null;
+    this.isAddingNewCategory = false;
   }
-  
-  // ฟังก์ชันสำหรับแก้ไขสินค้า
+
   onEdit(product: any): void {
-    this.isEditMode = true;  // เข้าสู่โหมดแก้ไข
-    this.selectedProductId = product.ProductId;  // เก็บรหัสสินค้าที่กำลังแก้ไข
-  
-    // ตั้งค่าให้กับฟอร์มสำหรับแก้ไข
+    this.isEditMode = true;
+    this.selectedProductId = product.ProductId;
+
     this.productForm.patchValue({
       productName: product.ProductName,
       categoryId: product.CategoryId,
@@ -117,25 +158,34 @@ export class AdminProductComponent implements OnInit {
       brand: product.Brand,
       model: product.Model
     });
-  
-    this.selectedFile = null;  // รีเซ็ตไฟล์เพื่อให้ผู้ใช้สามารถอัปโหลดไฟล์ใหม่
-  }
-  
 
-  // ฟังก์ชันสำหรับลบสินค้า
+    this.selectedFile = null;
+  }
+
   onDelete(productId: number): void {
-    if (!productId) {
-      console.error("Product ID is undefined or null");
-      return;
+    if (confirm('Are you sure you want to delete this product?')) {
+      this.productService.deleteProduct(productId).subscribe(
+        () => {
+          console.log('Product deleted successfully');
+          this.loadProducts();
+        },
+        error => {
+          console.error('Error deleting product:', error);
+        }
+      );
     }
-    this.productService.deleteProduct(productId).subscribe(
-      () => {
-        console.log('Product deleted successfully');
-        this.loadProducts();  // โหลดสินค้าหลังจากลบ
-      },
-      error => {
-        console.error('Error deleting product:', error);
-      }
-    );
+  }
+
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    } else {
+      this.selectedFile = null;
+    }
+  }
+
+  getImageUrl(imageUrl: string): string {
+    return imageUrl ? `http://localhost:3000${imageUrl}` : 'assets/default.jpg';
   }
 }

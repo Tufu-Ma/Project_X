@@ -1,11 +1,38 @@
-/* ปรับให้การ์ดมีขนาดและช่องว่างที่เหมาะสม */
-.card {
-  border: 1px solid #ddd;
-  border-radius: 0.25rem;
-  box-shadow: 0 0 1rem rgba(0,0,0,0.1);
+/* ปรับขนาดภาพสินค้าให้เล็กลง */
+/* ปรับขนาดภาพสินค้าในการ์ดให้พอดี */
+.card-img-top {
+  width: 100%; /* ทำให้ภาพเต็มการ์ด */
+  height: 200px; /* กำหนดความสูง */
+  object-fit: contain; /* แสดงภาพทั้งหมดภายในกรอบโดยไม่ถูกตัด */
+  padding: 10px; /* เพิ่ม padding รอบ ๆ ภาพเพื่อไม่ให้ติดขอบ */
 }
 
-.card-img-top {
-  height: 150px; /* กำหนดความสูงของรูปภาพ */
-  object-fit: cover; /* ปรับขนาดรูปให้เต็มกรอบ */
+
+/* จำกัดชื่อสินค้าให้แสดงไม่เกิน 2 บรรทัด */
+.card-title {
+  font-size: 0.9rem;
+  font-weight: bold;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* จำกัดให้แสดง 2 บรรทัด */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* เพิ่มช่องว่างระหว่างการ์ด */
+.card {
+  margin: 1px; /* เพิ่มช่องว่างรอบ ๆ การ์ดแต่ละใบ */
+  border: 1px solid #ddd;
+  border-radius: 1rem;
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+}
+
+/* เพิ่มช่องว่างระหว่างการ์ดในแนวนอนและแนวตั้ง */
+.d-flex {
+  gap: 10px; /* เพิ่มช่องว่างระหว่างการ์ดในแถว */
+}
+
+/* เพิ่มช่องว่างระหว่างแถว */
+.row {
+  margin-bottom: 20px;
 }

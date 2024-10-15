@@ -1,0 +1,54 @@
+.admin-manage-container {
+  max-width: 1270px; /* กำหนดความกว้างสูงสุด */
+  margin: 20px auto; /* จัดกลาง */
+  padding: 20px; /* เพิ่ม padding รอบๆ */
+  background-color: #f8f9fa; /* สีพื้นหลัง */
+  border-radius: 8px; /* มุมที่โค้ง */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* เงา */
+}
+
+.orders-table {
+  width: 100%; /* ให้ตารางเต็มความกว้าง */
+  margin-top: 20px; /* เพิ่มระยะห่างด้านบน */
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 12px; /* เพิ่ม padding ในเซลล์ */
+  text-align: left; /* จัดข้อความไปทางซ้าย */
+}
+
+.orders-table th {
+  background-color: #343a40; /* สีพื้นหลังสำหรับส่วนหัว */
+  color: white; /* สีตัวอักษร */
+}
+
+.action-container {
+  display: flex; /* ใช้ flexbox สำหรับจัดวาง */
+  align-items: center; /* จัดให้แนวกลาง */
+}
+
+.form-select {
+  margin-right: 10px; /* เว้นระยะห่างระหว่าง select กับปุ่ม */
+  min-width: 120px; /* ความกว้างขั้นต่ำของ select */
+}
+
+.update-btn {
+  background-color: #007bff; /* สีพื้นหลัง */
+  color: #ffffff; /* สีตัวอักษร */
+  border: none; /* ไม่มีกรอบ */
+  padding: 0.5rem 1rem; /* ขนาดของปุ่ม */
+  border-radius: 4px; /* มุมกลม */
+  transition: background-color 0.3s, transform 0.2s; /* เอฟเฟกต์การเปลี่ยนสีและขนาด */
+  margin-left: 10px; /* ระยะห่างด้านซ้ายจาก dropdown */
+}
+
+.update-btn:hover {
+  background-color: #0056b3; /* เปลี่ยนสีเมื่อเอาเมาส์ไปทับ */
+  transform: scale(1.05); /* ขยายปุ่มเล็กน้อย */
+}
+
+.update-btn:focus {
+  outline: none; /* ไม่แสดงกรอบเมื่อปุ่มถูกเลือก */
+}
+

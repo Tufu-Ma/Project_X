@@ -30,7 +30,7 @@ export class CartComponent implements OnInit {
       (items) => {
         console.log('Cart items received from service:', items);
         this.cartItems = items;
-        this.calculateTotal();
+        this.calculateTotal(); // คำนวณยอดรวมหลังจากดึงข้อมูลสินค้า
       },
       (error) => {
         console.error('Error fetching cart items', error);
@@ -65,7 +65,9 @@ export class CartComponent implements OnInit {
 
     this.cartService.removeFromCart(cartId).subscribe(
       () => {
-        this.getCartItems(); // รีเฟรชรายการหลังจากลบสินค้า
+        // อัปเดตข้อมูลหลังจากลบสินค้าออกจากรถเข็น
+        this.cartItems = this.cartItems.filter(item => item.CartId !== cartId);
+        this.calculateTotal(); // คำนวณยอดรวมใหม่หลังจากลบสินค้าออก
       },
       (error) => {
         console.error('Error removing item from cart:', error);
@@ -99,19 +101,24 @@ export class CartComponent implements OnInit {
       }
     );
   }
-  
 
-  // เพิ่มฟังก์ชันสำหรับการเพิ่มและลดจำนวนสินค้า
-increaseQuantity(item: any) {
-  item.Quantity++;
-  this.updateCartItem(item.CartId, item.Quantity);
-}
-
-decreaseQuantity(item: any) {
-  if (item.Quantity > 1) {
-    item.Quantity--;
-    this.updateCartItem(item.CartId, item.Quantity);
+  // เพิ่มจำนวนสินค้า
+  increaseQuantity(item: any) {
+    item.Quantity++;
+    this.updateCartItem(item.CartId, item.Quantity); // อัปเดตจำนวนสินค้าในรถเข็น
   }
+
+  // ลดจำนวนสินค้า
+  decreaseQuantity(item: any) {
+    if (item.Quantity > 1) {
+      item.Quantity--;
+      this.updateCartItem(item.CartId, item.Quantity); // อัปเดตจำนวนสินค้าในรถเข็น
+    }
+  }
+
+  // ฟังก์ชันสำหรับดึง URL ของภาพผลิตภัณฑ์
+getImageUrl(imageUrl: string): string {
+  return imageUrl ? `http://localhost:3000${imageUrl}` : 'assets/default.jpg'; // คืนค่าที่อยู่ภาพ
 }
 
 }
