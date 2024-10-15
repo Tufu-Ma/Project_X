@@ -20,16 +20,45 @@ export class AdminDashboardComponent implements OnInit {
   bestSellingProducts: Product[] = [];
   worstSellingProducts: Product[] = [];
   totalSalesData: any[] = [];
-  
+
   bestSellingChartData: any;
   worstSellingChartData: any;
   totalSalesChartData: any;
 
   chartOptions = {
-    responsive: true
+    responsive: true,
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: (tooltipItem: any) => {
+            const dataset = tooltipItem.dataset;
+            const dataIndex = tooltipItem.dataIndex;
+            const label = dataset.label || '';
+            const value = dataset.data[dataIndex];
+            return `${label}: ${value}`;
+          }
+        }
+      },
+      legend: {
+        display: false, // ซ่อน legend เพื่อไม่แสดงชื่อที่ยาวเกินไป
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          display: false // ซ่อนชื่อบนแกน X
+        },
+        grid: {
+          display: false // ซ่อนเส้นตารางของแกน X หากไม่ต้องการ
+        }
+      },
+      y: {
+        beginAtZero: true // เริ่มกราฟจาก 0
+      }
+    }
   };
-  chartLegend = true;
-
+  
+  chartLegend = false; // ซ่อน legend
   totalSalesChartType: ChartType = 'line';
   bestSellingChartType: ChartType = 'bar';
   worstSellingChartType: ChartType = 'bar';
@@ -61,15 +90,25 @@ export class AdminDashboardComponent implements OnInit {
       }
     );
 
-    this.salesService.getBestSellingProducts(this.startDate, this.endDate).subscribe((data: Product[]) => {
-      this.bestSellingProducts = data.sort((a: Product, b: Product) => b.TotalQuantity - a.TotalQuantity);
-      this.bestSellingChartData = this.mapChartData(this.bestSellingProducts, 'TotalQuantity');
-    });
+    this.salesService.getBestSellingProducts(this.startDate, this.endDate).subscribe(
+      (data: Product[]) => {
+        this.bestSellingProducts = data.sort((a: Product, b: Product) => b.TotalQuantity - a.TotalQuantity);
+        this.bestSellingChartData = this.mapChartData(this.bestSellingProducts, 'TotalQuantity');
+      },
+      (error) => {
+        console.error('Error fetching best selling products:', error);
+      }
+    );
 
-    this.salesService.getWorstSellingProducts(this.startDate, this.endDate).subscribe((data: Product[]) => {
-      this.worstSellingProducts = data.sort((a: Product, b: Product) => a.TotalQuantity - b.TotalQuantity);
-      this.worstSellingChartData = this.mapChartData(this.worstSellingProducts, 'TotalQuantity');
-    });
+    this.salesService.getWorstSellingProducts(this.startDate, this.endDate).subscribe(
+      (data: Product[]) => {
+        this.worstSellingProducts = data.sort((a: Product, b: Product) => a.TotalQuantity - b.TotalQuantity);
+        this.worstSellingChartData = this.mapChartData(this.worstSellingProducts, 'TotalQuantity');
+      },
+      (error) => {
+        console.error('Error fetching worst selling products:', error);
+      }
+    );
   }
 
   private mapChartData(data: any, valueField: string): any {

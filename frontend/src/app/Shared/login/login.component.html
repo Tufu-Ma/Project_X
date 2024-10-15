@@ -19,7 +19,11 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary">Login</button>
+      <!-- จัดปุ่ม Login และ Register ให้อยู่ในแนวเดียวกัน -->
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <button type="submit" class="btn btn-primary">Login</button>
+        <a [routerLink]="['/register']" class="btn btn-link">Register</a>
+      </div>
     </form>
 
     <!-- ลิงก์ Forgot Password -->
@@ -27,6 +31,7 @@
       <a [routerLink]="['/reset-password']">Forgot Password?</a>
     </div>
 
+    <!-- แสดงข้อความผิดพลาด -->
     <div *ngIf="errorMessage" class="alert alert-danger mt-2">
       {{ errorMessage }}
     </div>

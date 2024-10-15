@@ -8,13 +8,15 @@ const checkConnection = require('../utils/db'); // เชื่อมต่อ�
 async function getSalesData(startDate, endDate) {
     const pool = await checkConnection(); // เชื่อมต่อกับฐานข้อมูล
     const result = await pool.request()
-        .input('startDate', sql.Date, startDate) // รับพารามิเตอร์ startDate
-        .input('endDate', sql.Date, endDate) // รับพารามิเตอร์ endDate
-        .query(`SELECT CAST(O.OrderDate AS DATE) AS date, SUM(OI.TotalAmount) AS total
-                FROM OrderItems OI
-                JOIN Orders O ON OI.OrderId = O.OrderId
-                WHERE O.OrderStatus != 'Cancelled' AND O.OrderDate BETWEEN @startDate AND @endDate
-                GROUP BY CAST(O.OrderDate AS DATE)`);
+        .input('startDate', sql.DateTime, `${startDate} 00:00:00`) // ใช้เวลา 00:00:00
+        .input('endDate', sql.DateTime, `${endDate} 23:59:59`) // ใช้เวลา 23:59:59
+        .query(`
+            SELECT CAST(O.OrderDate AS DATE) AS date, SUM(OI.TotalAmount) AS total
+            FROM OrderItems OI
+            JOIN Orders O ON OI.OrderId = O.OrderId
+            WHERE O.OrderStatus != 'Cancelled' AND O.OrderDate BETWEEN @startDate AND @endDate
+            GROUP BY CAST(O.OrderDate AS DATE)
+        `);
     
     return result.recordset; // ส่งข้อมูลที่ดึงมา
 }
@@ -23,8 +25,8 @@ async function getSalesData(startDate, endDate) {
 async function getBestSellingProducts(startDate, endDate) {
     const pool = await checkConnection(); // เชื่อมต่อกับฐานข้อมูล
     const result = await pool.request()
-        .input('startDate', sql.Date, startDate) // ส่งพารามิเตอร์ startDate
-        .input('endDate', sql.Date, endDate) // ส่งพารามิเตอร์ endDate
+        .input('startDate', sql.DateTime, `${startDate} 00:00:00`) // ใช้เวลา 00:00:00
+        .input('endDate', sql.DateTime, `${endDate} 23:59:59`) // ใช้เวลา 23:59:59
         .query(`
             SELECT TOP 5 P.ProductName, SUM(OI.Quantity) AS TotalQuantity, SUM(OI.TotalAmount) AS TotalSales
             FROM OrderItems OI
@@ -41,8 +43,8 @@ async function getBestSellingProducts(startDate, endDate) {
 async function getWorstSellingProducts(startDate, endDate) {
     const pool = await checkConnection(); // เชื่อมต่อกับฐานข้อมูล
     const result = await pool.request()
-        .input('startDate', sql.Date, startDate) // ส่งพารามิเตอร์ startDate
-        .input('endDate', sql.Date, endDate) // ส่งพารามิเตอร์ endDate
+        .input('startDate', sql.DateTime, `${startDate} 00:00:00`) // ใช้เวลา 00:00:00
+        .input('endDate', sql.DateTime, `${endDate} 23:59:59`) // ใช้เวลา 23:59:59
         .query(`
             SELECT TOP 5 P.ProductName, SUM(OI.Quantity) AS TotalQuantity, SUM(OI.TotalAmount) AS TotalSales
             FROM OrderItems OI
@@ -55,11 +57,12 @@ async function getWorstSellingProducts(startDate, endDate) {
     return result.recordset; // ส่งข้อมูลสินค้าที่ขายไม่ดี
 }
 
+// ฟังก์ชันสำหรับดึงสินค้าทั้งหมดตามวันที่
 async function getSalesProducts(startDate, endDate) {
     const pool = await checkConnection();
     const result = await pool.request()
-        .input('startDate', sql.Date, startDate)
-        .input('endDate', sql.Date, endDate)
+        .input('startDate', sql.DateTime, `${startDate} 00:00:00`) // ใช้เวลา 00:00:00
+        .input('endDate', sql.DateTime, `${endDate} 23:59:59`) // ใช้เวลา 23:59:59
         .query(`
             SELECT P.ProductName, SUM(OI.Quantity) AS TotalQuantity, SUM(OI.TotalAmount) AS TotalSales
             FROM OrderItems OI
@@ -76,6 +79,7 @@ async function getSalesProducts(startDate, endDate) {
 router.get('/download', async (req, res) => {
     const { startDate, endDate } = req.query;
 
+    // ตรวจสอบวันที่
     if (!startDate || !endDate) {
         return res.status(400).json({ message: 'ต้องระบุวันเริ่มต้นและวันสิ้นสุด' });
     }
@@ -92,11 +96,10 @@ router.get('/download', async (req, res) => {
         ];
 
         const salesData = await getSalesData(startDate, endDate);
-        const salesProducts = await getSalesProducts(startDate, endDate); // ดึงข้อมูลสินค้าทั้งหมดในช่วงเวลาเดียวกัน
+        const salesProducts = await getSalesProducts(startDate, endDate);
 
-        // ดึงข้อมูลสินค้าที่ขายดีที่สุด
+        // ดึงข้อมูลสินค้าที่ขายดีที่สุดและสินค้าที่ขายไม่ดี
         const bestSellingProducts = salesProducts.sort((a, b) => b.TotalQuantity - a.TotalQuantity).slice(0, 5);
-        // ดึงข้อมูลสินค้าที่ขายไม่ดี
         const worstSellingProducts = salesProducts.sort((a, b) => a.TotalQuantity - b.TotalQuantity).slice(0, 5);
 
         for (const sale of salesData) {
@@ -119,54 +122,48 @@ router.get('/download', async (req, res) => {
     }
 });
 
-// ดึงข้อมูลยอดขายระหว่างช่วงวันที่
+// Route สำหรับดึงข้อมูลยอดขายระหว่างช่วงวันที่
 router.get('/sales-summary', async (req, res) => {
-    const { startDate, endDate } = req.query; // รับพารามิเตอร์วันที่จาก query
+    const { startDate, endDate } = req.query;
 
+    // ตรวจสอบวันที่
     if (!startDate || !endDate) {
         return res.status(400).json({ message: 'ต้องระบุวันเริ่มต้นและวันสิ้นสุด' });
     }
 
     try {
-        const pool = await checkConnection(); // เชื่อมต่อกับฐานข้อมูล
+        const pool = await checkConnection();
         const result = await pool.request()
-            .input('startDate', sql.Date, startDate) // ส่งพารามิเตอร์ startDate
-            .input('endDate', sql.Date, endDate) // ส่งพารามิเตอร์ endDate
-            .query(`SELECT CAST(O.OrderDate AS DATE) AS date, SUM(OI.TotalAmount) AS total
-                    FROM OrderItems OI
-                    JOIN Orders O ON OI.OrderId = O.OrderId
-                    WHERE O.OrderStatus != 'Cancelled' AND O.OrderDate BETWEEN @startDate AND @endDate
-                    GROUP BY CAST(O.OrderDate AS DATE)`);
+            .input('startDate', sql.DateTime, `${startDate} 00:00:00`) // ใช้เวลา 00:00:00
+            .input('endDate', sql.DateTime, `${endDate} 23:59:59`) // ใช้เวลา 23:59:59
+            .query(`
+                SELECT CAST(O.OrderDate AS DATE) AS date, SUM(OI.TotalAmount) AS total
+                FROM OrderItems OI
+                JOIN Orders O ON OI.OrderId = O.OrderId
+                WHERE O.OrderStatus != 'Cancelled' AND O.OrderDate BETWEEN @startDate AND @endDate
+                GROUP BY CAST(O.OrderDate AS DATE)
+            `);
         
-        const totalSales = result.recordset.reduce((sum, item) => sum + item.total, 0); // คำนวณยอดขายรวม
-        res.json({ totalSales, sales: result.recordset }); // ส่งยอดขายรวมและข้อมูลยอดขายตามวัน
+        const totalSales = result.recordset.reduce((sum, item) => sum + item.total, 0);
+        res.json({ totalSales, sales: result.recordset });
     } catch (err) {
         console.error('เกิดข้อผิดพลาดในการดึงยอดขายสรุป:', err);
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงยอดขายสรุป', error: err.message });
     }
 });
 
-// ดึงข้อมูลจากตาราง OrderItems ทั้งหมด
-router.get('/order-items', async (req, res) => {
-    try {
-        const pool = await checkConnection(); // ใช้การเชื่อมต่อฐานข้อมูล
-        const result = await pool.request().query('SELECT * FROM OrderItems'); // ดึงข้อมูลจากตาราง OrderItems
-        res.json(result.recordset); // ส่งข้อมูลในรูปแบบ JSON กลับไปให้ client
-    } catch (err) {
-        console.error('เกิดข้อผิดพลาดในการดึงข้อมูลรายการสั่งซื้อ:', err);
-        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูลรายการสั่งซื้อ', error: err.message });
-    }
-});
-
 // Route สำหรับดึงข้อมูลสินค้าที่ขายดีที่สุด
 router.get('/best-selling-products', async (req, res) => {
-    const { startDate, endDate } = req.query; // รับพารามิเตอร์วันที่จาก query
-    console.log(`Received request for best-selling-products from ${startDate} to ${endDate}`);
+    const { startDate, endDate } = req.query;
+
+    // ตรวจสอบวันที่
+    if (!startDate || !endDate) {
+        return res.status(400).json({ message: 'ต้องระบุวันเริ่มต้นและวันสิ้นสุด' });
+    }
 
     try {
-        const bestSellingProducts = await getBestSellingProducts(startDate, endDate); // เรียกใช้งานฟังก์ชัน
-        console.log('Best Selling Products:', bestSellingProducts); // แสดงข้อมูลใน console
-        res.json(bestSellingProducts); // ส่งข้อมูลสินค้าที่ขายดีที่สุดกลับไป
+        const bestSellingProducts = await getBestSellingProducts(startDate, endDate);
+        res.json(bestSellingProducts);
     } catch (error) {
         console.error('Error fetching best selling products:', error);
         res.status(500).json({ message: 'Error fetching best selling products', error: error.message });
@@ -175,15 +172,20 @@ router.get('/best-selling-products', async (req, res) => {
 
 // Route สำหรับดึงข้อมูลสินค้าที่ขายไม่ดี
 router.get('/worst-selling-products', async (req, res) => {
-    const { startDate, endDate } = req.query; // รับพารามิเตอร์วันที่จาก query
+    const { startDate, endDate } = req.query;
+
+    // ตรวจสอบวันที่
+    if (!startDate || !endDate) {
+        return res.status(400).json({ message: 'ต้องระบุวันเริ่มต้นและวันสิ้นสุด' });
+    }
 
     try {
-        const worstSellingProducts = await getWorstSellingProducts(startDate, endDate); // เรียกใช้งานฟังก์ชัน
-        res.json(worstSellingProducts); // ส่งข้อมูลสินค้าที่ขายไม่ดีกลับไป
+        const worstSellingProducts = await getWorstSellingProducts(startDate, endDate);
+        res.json(worstSellingProducts);
     } catch (error) {
         console.error('Error fetching worst selling products:', error);
         res.status(500).json({ message: 'Error fetching worst selling products', error: error.message });
     }
 });
 
-module.exports = router; // ส่งออก router
+module.exports = router;

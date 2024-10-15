@@ -1,7 +1,22 @@
 /* ปรับขนาดภาพสินค้าให้เล็กลง */
+/* ปรับขนาดภาพสินค้าในการ์ดให้พอดี */
 .card-img-top {
-  height: 200px; /* ปรับความสูงของภาพให้เล็กลง */
-  object-fit: cover; /* ทำให้ภาพเต็มกรอบโดยไม่ถูกยืด */
+  width: 100%; /* ทำให้ภาพเต็มการ์ด */
+  height: 200px; /* กำหนดความสูง */
+  object-fit: contain; /* แสดงภาพทั้งหมดภายในกรอบโดยไม่ถูกตัด */
+  padding: 10px; /* เพิ่ม padding รอบ ๆ ภาพเพื่อไม่ให้ติดขอบ */
+}
+
+
+/* จำกัดชื่อสินค้าให้แสดงไม่เกิน 2 บรรทัด */
+.card-title {
+  font-size: 0.9rem;
+  font-weight: bold;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* จำกัดให้แสดง 2 บรรทัด */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* เพิ่มช่องว่างระหว่างการ์ด */

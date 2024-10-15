@@ -14,7 +14,6 @@ import { HomeComponent } from './Shared/home/home.component';
 import { ResetPasswordComponent } from './Shared/reset-password/reset-password.component';
 import { ProductDetailComponent } from './Shared/product-detail/product-detail.component';
 import { HeaderComponent } from './Shared/header/header.component';
-import { FooterComponent } from './Shared/footer/footer.component';
 import { LoginHeaderComponent } from './Shared/login/login-header/login-header.component';
 import { AboutUsComponent } from './Shared/about-us/about-us.component';
 import { ContactUsComponent } from './Shared/contact-us/contact-us.component';
@@ -63,7 +62,6 @@ const routes: Routes = [
     ResetPasswordComponent,
     ProductDetailComponent,
     HeaderComponent,
-    FooterComponent,
     LoginHeaderComponent,
     AboutUsComponent,
     ContactUsComponent,

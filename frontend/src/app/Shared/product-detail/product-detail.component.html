@@ -27,9 +27,10 @@
         </div>
 
         <!-- ปุ่มเพิ่มสินค้าในตะกร้า -->
-        <button class="btn btn-primary" (click)="addToCart()" [disabled]="product.Stock <= 0">
-          {{ product.Stock > 0 ? 'เพิ่มไปยังรถเข็น' : 'สินค้าหมด' }}
-        </button>        
+<button class="btn btn-primary mt-3" (click)="addToCart()" [disabled]="product.Stock <= 0">
+  {{ product.Stock > 0 ? 'เพิ่มไปยังรถเข็น' : 'สินค้าหมด' }}
+</button>
+       
       </div>
     </div>
   </div>

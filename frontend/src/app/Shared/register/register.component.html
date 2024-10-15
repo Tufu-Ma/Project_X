@@ -2,33 +2,37 @@
 <div class="container">
     <h2>Register</h2>
     <form (ngSubmit)="onRegister()">
-      <!-- ชื่อจริง -->
-      <div class="form-group">
-        <label for="firstName">First Name</label>
-        <input type="text" id="firstName" [(ngModel)]="firstName" name="firstName" class="form-control" required>
+      <div class="row">
+        <!-- ชื่อจริง -->
+        <div class="form-group col-md-6">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" [(ngModel)]="firstName" name="firstName" class="form-control" required>
+        </div>
+
+        <!-- นามสกุล -->
+        <div class="form-group col-md-6">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" [(ngModel)]="lastName" name="lastName" class="form-control" required>
+        </div>
       </div>
 
-      <!-- นามสกุล -->
-      <div class="form-group">
-        <label for="lastName">Last Name</label>
-        <input type="text" id="lastName" [(ngModel)]="lastName" name="lastName" class="form-control" required>
-      </div>
+      <div class="row">
+        <!-- เพศ -->
+        <div class="form-group col-md-6">
+          <label for="gender">Gender (Optional)</label>
+          <select id="gender" [(ngModel)]="gender" name="gender" class="form-control">
+            <option value="">Select gender (optional)</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
 
-      <!-- เพศ -->
-      <div class="form-group">
-        <label for="gender">Gender (Optional)</label>
-        <select id="gender" [(ngModel)]="gender" name="gender" class="form-control">
-          <option value="">Select gender (optional)</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-
-      <!-- อีเมล -->
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" [(ngModel)]="email" name="email" class="form-control" required>
+        <!-- อีเมล -->
+        <div class="form-group col-md-6">
+          <label for="email">Email</label>
+          <input type="email" id="email" [(ngModel)]="email" name="email" class="form-control" required>
+        </div>
       </div>
 
       <!-- ชื่อผู้ใช้ -->
@@ -70,7 +74,7 @@
       </div>
 
       <!-- ปุ่มลงทะเบียน -->
-      <button type="submit" class="btn btn-primary">Register</button>
+      <button type="submit" class="btn btn-primary mt-3">Register</button>
     </form>
 
     <!-- แสดงข้อความ error -->
